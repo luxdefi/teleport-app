@@ -24,6 +24,11 @@ import { Token } from "state/types";
 import { useAllTokens, useToken } from "state/swap/hooks";
 import { ChainId } from "constants/chainIds";
 import useToggle from "hooks/useToggle";
+import {
+  AVAILABLE_NETWORKS,
+  NETWORK_ICON,
+  NETWORK_LABEL,
+} from "config/networks";
 interface CurrencySearchProps {
   isOpen: boolean;
   onDismiss: () => void;
@@ -168,16 +173,16 @@ export function CurrencySearch({
   useOnClickOutside(node, open ? toggle : undefined);
 
   return (
-    <div className="flex flex-col max-h-[inherit]">
+    <div className="flex flex-col">
       <ModalHeader
         title="Select a token"
         titleClassName="text-white text-2xl font-semibold"
-        className="px-6 py-5 bg-space-grey h-full"
+        className="px-6 py-5 bg-space-grey"
         onClose={onDismiss}
       />
-      <div className="flex flex-col px-6 pb-8 min-w-[82vw] md:min-w-[400px]">
+      <div className="flex h-full flex-col pr-6 min-w-[82vw] md:min-w-[400px]">
         {!currencyList && (
-          <div className="mt-0 mb-3 sm:mt-3 sm:mb-8">
+          <div className="pl-6 mt-0 mb-3 sm:mt-3 sm:mb-8">
             <input
               type="text"
               id="token-search-input"
@@ -192,41 +197,62 @@ export function CurrencySearch({
           </div>
         )}
 
-        {searchToken ? (
-          <div style={{ padding: "20px 0", height: "100%" }}>
-            <ImportRow
-              token={searchToken}
-              showImportView={showImportView}
-              setImportToken={setImportToken}
-            />
+        <div className="flex h-full">
+          <div className="flex flex-wrap w-1/4 bg-dark-800 max-h-[inherit]">
+            {AVAILABLE_NETWORKS.map((network: number) => (
+              <div className="flex flex-col items-center justify-center w-1/2 p-2 ">
+                <div
+                  className={`cursor-pointer flex flex-col items-center justify-center w-16 h-16 rounded ${
+                    chainId === network && "border"
+                  } bg-dark-700 border-primary`}
+                >
+                  <img
+                    className="w-8 h-8 rounded-full"
+                    src={`${NETWORK_ICON[network]}`}
+                  />
+                  <p className="pt-1 text-xs text-grey-800">
+                    {NETWORK_LABEL[network]}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        ) : filteredSortedTokens?.length > 0 ? (
-          <div className="h-screen">
-            <AutoSizer disableWidth>
-              {({ height }) => (
-                <CurrencyList
-                  height={height}
-                  currencies={
-                    includeNativeCurrency
-                      ? filteredSortedTokensWithETH
-                      : filteredSortedTokens
-                  }
-                  onCurrencySelect={handleCurrencySelect}
-                  otherCurrency={otherSelectedCurrency}
-                  selectedCurrency={selectedCurrency}
-                  fixedListRef={fixedList}
-                  showImportView={showImportView}
-                  setImportToken={setImportToken}
-                />
-              )}
-            </AutoSizer>
-          </div>
-        ) : (
-          <div style={{ padding: "20px", height: "100%" }}>
-            <div className="mb-8 text-center">No results found</div>
-          </div>
-        )}
-        {allowManageTokenList && (
+          {searchToken ? (
+            <div style={{ padding: "20px 0", height: "100%" }}>
+              <ImportRow
+                token={searchToken}
+                showImportView={showImportView}
+                setImportToken={setImportToken}
+              />
+            </div>
+          ) : filteredSortedTokens?.length > 0 ? (
+            <div className="h-screen">
+              <AutoSizer disableWidth>
+                {({ height }) => (
+                  <CurrencyList
+                    height={height}
+                    currencies={
+                      includeNativeCurrency
+                        ? filteredSortedTokensWithETH
+                        : filteredSortedTokens
+                    }
+                    onCurrencySelect={handleCurrencySelect}
+                    otherCurrency={otherSelectedCurrency}
+                    selectedCurrency={selectedCurrency}
+                    fixedListRef={fixedList}
+                    showImportView={showImportView}
+                    setImportToken={setImportToken}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+          ) : (
+            <div style={{ padding: "20px", height: "100%" }}>
+              <div className="mb-8 text-center">No results found</div>
+            </div>
+          )}
+        </div>
+        {/* {allowManageTokenList && (
           <div className="mt-3">
             <button
               id="list-token-manage-button"
@@ -236,8 +262,89 @@ export function CurrencySearch({
               Manage Token Lists
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </div>
+    // <div className="flex flex-col max-h-[inherit] h-full">
+    //   <ModalHeader
+    //     title="Select a token"
+    //     titleClassName="text-white text-2xl font-semibold"
+    //     className="h-full px-6 py-5 bg-space-grey"
+    //     onClose={onDismiss}
+    //   />
+    //   <div className="flex flex-1 flex-col pr-6 pb-8 min-w-[82vw] md:min-w-[400px]">
+    //     {!currencyList && (
+    //       <div className="mt-0 mb-3 sm:mt-3 sm:mb-8">
+    //         <input
+    //           type="text"
+    //           id="token-search-input"
+    //           placeholder="Search name or paste address"
+    //           autoComplete="off"
+    //           value={searchQuery}
+    //           ref={inputRef as RefObject<HTMLInputElement>}
+    //           onChange={handleInput}
+    //           onKeyDown={handleEnter}
+    //           className="w-full bg-transparent border border-dark-700 focus:outline-none rounded placeholder-secondary focus:placeholder-primary font-bold text-base px-6 py-3.5"
+    //         />
+    //       </div>
+    //     )}
+
+    //     <div className="flex">
+    //       <div className="flex flex-wrap w-24 bg-white max-h-[inherit]">
+    //         {AVAILABLE_NETWORKS.map((network) => (
+    //           <div className="flex flex-col items-center justify-center w-10 h-10 m-1">
+    //             <img className="w-10 h-10" src={`${NETWORK_ICON[network]}`} />
+    //             <p>{NETWORK_LABEL[network]}</p>
+    //           </div>
+    //         ))}
+    //       </div>
+    //       {searchToken ? (
+    //         <div style={{ padding: "20px 0", height: "100%" }}>
+    //           <ImportRow
+    //             token={searchToken}
+    //             showImportView={showImportView}
+    //             setImportToken={setImportToken}
+    //           />
+    //         </div>
+    //       ) : filteredSortedTokens?.length > 0 ? (
+    //         <div className="h-screen">
+    //           <AutoSizer disableWidth>
+    //             {({ height }) => (
+    //               <CurrencyList
+    //                 height={height}
+    //                 currencies={
+    //                   includeNativeCurrency
+    //                     ? filteredSortedTokensWithETH
+    //                     : filteredSortedTokens
+    //                 }
+    //                 onCurrencySelect={handleCurrencySelect}
+    //                 otherCurrency={otherSelectedCurrency}
+    //                 selectedCurrency={selectedCurrency}
+    //                 fixedListRef={fixedList}
+    //                 showImportView={showImportView}
+    //                 setImportToken={setImportToken}
+    //               />
+    //             )}
+    //           </AutoSizer>
+    //         </div>
+    //       ) : (
+    //         <div style={{ padding: "20px", height: "100%" }}>
+    //           <div className="mb-8 text-center">No results found</div>
+    //         </div>
+    //       )}
+    //     </div>
+    //     {/* {allowManageTokenList && (
+    //       <div className="mt-3">
+    //         <button
+    //           id="list-token-manage-button"
+    //           onClick={showManageView}
+    //           color="gray"
+    //         >
+    //           Manage Token Lists
+    //         </button>
+    //       </div>
+    //     )} */}
+    //   </div>
+    // </div>
   );
 }

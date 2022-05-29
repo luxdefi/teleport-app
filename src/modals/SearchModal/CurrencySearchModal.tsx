@@ -71,7 +71,7 @@ function CurrencySearchModal({
       // maxHeight={75}
       // minHeight={minHeight}
       // padding={1}
-      maxWidth={500}
+      maxWidth={800}
       isOpen={isOpen}
       onDismiss={onDismiss}
       minHeight={minHeight}
