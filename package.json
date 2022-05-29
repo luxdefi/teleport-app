@@ -20,6 +20,8 @@
     "@gnosis.pm/safe-apps-web3-react": "^0.6.8",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
+    "@lingui/macro": "^3.13.3",
+    "@lingui/react": "^3.13.3",
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.8",
     "@reduxjs/toolkit": "^1.7.1",

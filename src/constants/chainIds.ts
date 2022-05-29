@@ -1,3 +1,5 @@
+import { Avalanche, Binance, Celo, Ether, Fantom, Fuse, Harmony, Heco, Matic, Movr, Okex, Palm, xDai } from './entities/Native';
+
 export enum ChainId {
   MAINNET = 1,
   ROPSTEN = 3,
@@ -30,3 +32,32 @@ export enum ChainId {
   HARDHAT = 1337,
   HARDHAT2 = 1338
 }
+export declare const NATIVE: {
+  1: Ether;
+  3: Ether;
+  4: Ether;
+  5: Ether;
+  42: Ether;
+  250: Fantom;
+  4002: Fantom;
+  137: Matic;
+  80001: Matic;
+  100: xDai;
+  56: Binance;
+  97: Binance;
+  42161: Ether;
+  43114: Avalanche;
+  43113: Avalanche;
+  128: Heco;
+  256: Heco;
+  1666600000: Harmony;
+  1666700000: Harmony;
+  66: Okex;
+  65: Okex;
+  42220: Celo;
+  11297108109: Palm;
+  1285: Movr;
+  122: Fuse;
+  1337: Ether;
+  1338: Ether;
+};
