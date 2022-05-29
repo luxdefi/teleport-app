@@ -6,8 +6,8 @@ export default function Home() {
     <>
       <div>
         <Head>
-          <title>Montech Template</title>
-          <meta name="description" content="Montech Template" />
+          <title>BRIDGE</title>
+          <meta name="description" content="Bridge" />
         </Head>
       </div>
     </>
