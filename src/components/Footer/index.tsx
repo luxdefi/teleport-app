@@ -20,7 +20,7 @@ const Footer = () => {
                   src="/images/logo2.svg"
                   width={110}
                   height={96}
-                  alt="space coin logo"
+                  alt="Lux logo"
                 />
               </Link>
             </div>

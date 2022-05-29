@@ -34,7 +34,7 @@ const initialState: SwapState = {
       decimals: 18,
       symbol: "LUX",
       address: "0x3f5919205A01fa0c44E8F4C4Ba897629b26B076a",
-      logoURI: "/favicon.ico",
+      logoURI: "/lux_logo.svg",
       name: "LUX",
       isNative: false,
     },

@@ -63,10 +63,10 @@ function AppBar(props: { banner?: boolean }): JSX.Element {
                   <Link href="">
                     <div className=" h-full pl-2 cursor-pointer logo w-full lg:w-[120px] flex">
                       <Image
-                        src="/images/logo2.svg"
+                        src="/lux_logo.svg"
                         width={130}
                         height={50}
-                        alt="space coin logo"
+                        alt="Lux logo"
                       />
                     </div>
                   </Link>
@@ -136,7 +136,7 @@ function AppBar(props: { banner?: boolean }): JSX.Element {
                                   const tokenSymbol = "LUX";
                                   const tokenDecimals = 18;
                                   const tokenImage =
-                                    window.location.origin + "/favicon.ico";
+                                    window.location.origin + "/lux_logo.svg";
                                   if (
                                     connector &&
                                     connector === metaMask &&
@@ -172,7 +172,7 @@ function AppBar(props: { banner?: boolean }): JSX.Element {
                                 }}
                               >
                                 <Image
-                                  src="/favicon.ico"
+                                  src="/lux_logo.svg"
                                   alt="LUX"
                                   width={30}
                                   height={30}

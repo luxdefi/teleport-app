@@ -6,8 +6,9 @@ export default function Home() {
     <>
       <div>
         <Head>
-          <title>BRIDGE</title>
+          <title>LUX</title>
           <meta name="description" content="Bridge" />
+          <link rel="icon" href="/lux_logo.svg" />
         </Head>
       </div>
     </>
