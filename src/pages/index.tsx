@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import Swap from "./swap";
 
 export default function Home() {
   return (

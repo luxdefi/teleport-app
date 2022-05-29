@@ -8,9 +8,7 @@ import NavLink from "../NavLink";
 import { Popover } from "@headlessui/react";
 import Web3Network from "../Web3Network";
 import Web3Status from "../Web3Status";
-import { t } from "@lingui/macro";
 import { useActiveWeb3React } from "../../hooks/useActiveWeb3React";
-import { useLingui } from "@lingui/react";
 import { NATIVE } from "constants/chainIds";
 import useBalances from "hooks/useBalance";
 import { useGetLuxBalance } from "state/Lux/hooks";
@@ -21,7 +19,6 @@ import { formatBalance } from "functions/format";
 // import { ReactComponent as Burger } from "../assets/images/burger.svg";
 
 function AppBar(): JSX.Element {
-  const { i18n } = useLingui();
   const { account, chainId, library, accounts } = useActiveWeb3React();
 
   const balances = useBalances(library, accounts);
@@ -34,7 +31,7 @@ function AppBar(): JSX.Element {
 
   return (
     //     // <header className="flex flex-row justify-between w-screen flex-nowrap">
-    <header className="flex-shrink-0 w-full">
+    <header className="absolute flex-shrink-0 w-full">
       <Popover as="nav" className="z-10 w-full bg-transparent header-border-b">
         {({ open }) => (
           <>
@@ -43,17 +40,15 @@ function AppBar(): JSX.Element {
                 <div className="flex items-center">
                   {/* <Image src="/logo.png" alt="Sushi" width="32px" height="32px" /> */}
 
-                  <NavLink href="/">
+                  <NavLink href="/swap">
                     <div className="flex items-center pl-2 cursor-pointer logo">
                       <Image
-                        src="/luxlogo.png"
+                        src="/lux_logo.svg"
                         className="w-10"
                         alt="Logo"
                         width={32}
                         height={32}
                       />
-
-                      <span className="ml-2 text-lg">Lux</span>
                     </div>
                   </NavLink>
                   <div className="hidden sm:block sm:ml-4">
@@ -63,7 +58,7 @@ function AppBar(): JSX.Element {
                           id={`swap-nav-link`}
                           className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
                         >
-                          {i18n._(t`Swap`)}
+                          Swap
                         </a>
                       </NavLink>
                     </div>
@@ -171,7 +166,7 @@ function AppBar(): JSX.Element {
                     )}
 
                     <div className="w-auto flex items-center rounded bg-dark-900 hover:bg-dark-800 p-0.5 whitespace-nowrap text-sm font-bold cursor-pointer select-none pointer-events-auto">
-                      {account && chainId && balances && (
+                      {account && chainId && (
                         <>
                           <div className="px-3 py-2 text-primary text-bold">
                             {balances?.[0]
@@ -181,18 +176,18 @@ function AppBar(): JSX.Element {
                           </div>
                         </>
                       )}
-                      <Web3Status />
+                      <Web3Status title="Connect Wallet" />
                     </div>
                     {/* <div className="hidden md:block">
                       <LanguageSwitch />
                     </div> */}
-                    <More />
+                    {/* <More /> */}
                   </div>
                 </div>
                 <div className="flex -mr-2 sm:hidden">
                   {/* Mobile menu button */}
                   <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-high-emphesis focus:outline-none">
-                    <span className="sr-only">{i18n._(t`Open main menu`)}</span>
+                    <span className="sr-only">Open main menu</span>
                     {open ? (
                       <svg
                         className="block w-6 h-6"
@@ -239,7 +234,7 @@ function AppBar(): JSX.Element {
                     id={`swap`}
                     className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
                   >
-                    {i18n._(t`SWAP`)}
+                    SWAP
                   </a>
                 </Link>
               </div>

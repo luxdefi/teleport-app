@@ -13,22 +13,14 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { chainId } = useActiveWeb3React();
   return (
-    <div className="relative bg-black AppLayout">
+    <div className="z-0 flex flex-col items-center w-full h-screen pb-16 lg:pb-0">
       <Header />
-      <div
-        className="AppLayout__body bg-[url('/icons/dots.svg')]"
-        style={{
-          // minHeight: "70vh",
-          // cursor: [ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
-          //   ? "default"
-          //   : "no-drop",
-          zIndex: [ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
-            ? 1
-            : -500,
-        }}
+      <main
+        className="flex flex-col items-center justify-start flex-grow w-full h-full bg-black"
+        // style={{ height: "max-content" }}
       >
         {children}
-      </div>
+      </main>
       {/* <Footer /> */}
     </div>
   );
