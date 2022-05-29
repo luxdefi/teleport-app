@@ -58,6 +58,8 @@ export function CurrencySearch({
   includeNativeCurrency = true,
   allowManageTokenList = true,
 }: CurrencySearchProps) {
+  const [selectedNetwork, setSelectedNetwork] = useState(1);
+  const [networkTokens, setNetworkTokens] = useState([]);
   const { chainId } = useActiveWeb3React();
 
   // refs for fixed size lists
@@ -84,8 +86,8 @@ export function CurrencySearch({
   const searchToken = useToken(debouncedQuery);
 
   const filteredTokens: Token[] = useMemo(() => {
-    return filterTokens(Object.values(allTokens), debouncedQuery);
-  }, [allTokens, debouncedQuery]);
+    return filterTokens(Object.values(networkTokens), debouncedQuery);
+  }, [networkTokens, debouncedQuery]);
   const sortedTokens: Token[] = useMemo(() => {
     return filteredTokens.sort(tokenComparator);
   }, [filteredTokens, tokenComparator]);
@@ -151,7 +153,7 @@ export function CurrencySearch({
         const s = debouncedQuery.toLowerCase().trim();
         if (s === "eth" && ether) {
           handleCurrencySelect(
-            allTokens.find((token) => token.symbol === "eth")
+            networkTokens.find((token) => token.symbol === "eth")
           );
         } else if (filteredSortedTokensWithETH.length > 0) {
           if (
@@ -172,6 +174,9 @@ export function CurrencySearch({
   const node = useRef<HTMLDivElement>();
   useOnClickOutside(node, open ? toggle : undefined);
 
+  useEffect(() => {
+    setNetworkTokens(allTokens[selectedNetwork] || []);
+  }, [selectedNetwork]);
   return (
     <div className="flex flex-col">
       <ModalHeader
@@ -200,10 +205,15 @@ export function CurrencySearch({
         <div className="flex h-full">
           <div className="flex flex-wrap w-1/4 bg-dark-800 max-h-[inherit]">
             {AVAILABLE_NETWORKS.map((network: number) => (
-              <div className="flex flex-col items-center justify-center w-1/2 p-2 ">
+              <div
+                onClick={() => {
+                  setSelectedNetwork(network);
+                }}
+                className="flex flex-col items-center justify-center w-1/2 p-2 cursor-pointer "
+              >
                 <div
-                  className={`cursor-pointer flex flex-col items-center justify-center w-16 h-16 rounded ${
-                    chainId === network && "border"
+                  className={`flex flex-col items-center justify-center w-16 h-16 rounded ${
+                    selectedNetwork === network && "border"
                   } bg-dark-700 border-primary`}
                 >
                   <img

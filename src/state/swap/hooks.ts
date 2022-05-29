@@ -18,7 +18,7 @@ import {
 } from "./action";
 import { notify } from "components/alertMessage";
 
-export function useAllTokens(): Token[] {
+export function useAllTokens(): { [chainId in ChainId]?: Token[] } {
   return useSelector((state: AppState) => state.swap.tokens);
 }
 export function useGetAvailableTokens(): () => void {
