@@ -1,126 +1,218 @@
-import { formatBalance, shortenAddress } from "functions/format";
-import useActiveWeb3React from "hooks/useActiveWeb3React";
-import useBalances from "hooks/useBalance";
-import CopyIcon from "Icons/Copy";
-import LinkIcon from "Icons/Link";
-import Link from "next/link";
-import React from "react";
-import { useState } from "react";
-import {
-  useWalletModalToggle,
-  useWalletSidebarToggle,
-} from "state/application/hooks";
+import React, { FC, useCallback } from "react";
+import { SUPPORTED_WALLETS, injected } from "../../config/wallets";
+import Image from "next/image";
+import { useActiveWeb3React } from "../../hooks/useActiveWeb3React";
+import { useDispatch, useSelector } from "react-redux";
+import { metaMask } from "connectors/metaMask";
+import { walletConnect } from "connectors/walletConnect";
+import { coinbaseWallet } from "connectors/coinbaseWallet";
+import { AppDispatch, AppState } from "state/store";
+import ModalHeader from "components/Modal/Header";
+import { numberWithCommas, shortenAddress } from "functions/format";
+import Copy from "components/Copy";
+import { getExplorerLink } from "functions/explorer";
+import { LinkIcon } from "@heroicons/react/outline";
 import { getName } from "state/application/HooksProvider";
-import { useAppSelector } from "state/hooks";
+import { Connector } from "@web3-react/types";
+const WalletIcon: FC<{
+  size?: number;
+  src: string;
+  alt: string;
+  children?: any;
+}> = ({ size, src, alt, children }) => {
+  return (
+    <div className="flex flex-row items-end justify-center mr-2 flex-nowrap md:items-center">
+      <>
+        <Image src={src} alt={alt} width={size} height={size} />
+        <>{children}</>
+      </>
+    </div>
+  );
+};
 
-const AccountDropdown = () => {
-  const { library, accounts, account, connector } = useActiveWeb3React();
-  const balances = useBalances(library, accounts);
-  const { userNfts }: any = useAppSelector((state) => state.nfts);
+// function renderTransactions(transactions: string[]) {
+//   return (
+//     <div className="flex flex-col gap-2 flex-nowrap">
+//       {transactions.map((hash, i) => {
+//         return <Transaction key={i} hash={hash} />;
+//       })}
+//     </div>
+//   );
+// }
 
-  const [isCopied, setIsCopied] = useState(false);
+interface AccountDetailsProps {
+  toggleWalletModal: () => void;
+  // pendingTransactions: string[];
+  // confirmedTransactions: string[];
+  ENSName?: string;
+  openOptions: () => void;
+}
 
-  const toggleWalletSidebar = useWalletSidebarToggle();
+const AccountDetails: FC<AccountDetailsProps> = ({
+  toggleWalletModal,
+  // pendingTransactions,
+  // confirmedTransactions,
+  ENSName,
+  openOptions,
+}) => {
+  const { chainId, account, connector } = useActiveWeb3React();
+  const dispatch = useDispatch<AppDispatch>();
+  const luxBalance = useSelector<AppState, AppState["lux"]["luxBalance"]>(
+    (state) => state.lux.luxBalance
+  );
 
-  async function copyTextToClipboard(text) {
-    if ("clipboard" in navigator) {
-      return await navigator.clipboard.writeText(text);
-    } else {
-      return document.execCommand("copy", true, text);
-    }
+  function formatConnectorName() {
+    const { ethereum } = window;
+    const isMetaMask = !!(ethereum && ethereum.isMetaMask);
+    const name = Object.keys(SUPPORTED_WALLETS)
+      .filter(
+        (k) =>
+          SUPPORTED_WALLETS[k].connector === connector &&
+          (connector !== metaMask || isMetaMask === (k === "METAMASK"))
+      )
+      .map((k) => SUPPORTED_WALLETS[k].name)[0];
+    return (
+      <div className="font-medium text-baseline text-secondary">
+        Connected with {name}
+      </div>
+    );
   }
 
-  const handleCopyClick = (copyText) => {
-    copyTextToClipboard(copyText)
-      .then(() => {
-        setIsCopied(true);
-        setTimeout(() => {
-          setIsCopied(false);
-        }, 1500);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
+  // const clearAllTransactionsCallback = useCallback(() => {
+  //   if (chainId) dispatch(clearAllTransactions({ chainId }));
+  // }, [dispatch, chainId]);
+  function getStatusIcon() {
+    if (connector === metaMask) {
+      return (
+        <WalletIcon
+          src="/images/wallets/metamask.png"
+          alt="Metamask"
+          size={16}
+        />
+      );
+    } else if (connector === walletConnect) {
+      return (
+        <WalletIcon
+          src="/images/wallets/wallet-connect.svg"
+          alt="Wallet Connect"
+          size={16}
+        />
+      );
+    } else if (connector === coinbaseWallet) {
+      return <WalletIcon src="/coinbase.svg" alt="Coinbase" size={16} />;
+    } else if (connector.constructor.name === "FortmaticConnector") {
+      return <WalletIcon src="/formatic.png" alt="Fortmatic" size={16} />;
+    } else if (connector.constructor.name === "PortisConnector") {
+      return (
+        <WalletIcon src="/portnis.png" alt="Portis" size={16}>
+          <button
+            onClick={async () => {
+              // casting as PortisConnector here defeats the lazyload purpose
+              (connector as any).portis.showPortis();
+            }}
+          >
+            Show Portis
+          </button>
+        </WalletIcon>
+      );
+    } else if (connector.constructor.name === "TorusConnector") {
+      return <WalletIcon src="/torus.png" alt="Torus" size={16} />;
+    }
+    return null;
+  }
   return (
-    <div className="w-11/12 sm:min-w-[420px] sm:w-auto bg-dark2 rounded-xl absolute top-3/4 translate-y-2 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-7 z-999 p-4 sm:p-6 space-y-7">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white font-work_sans">
-          Account
-        </h1>
-        {/* <button
-          className="w-28 h-9 border border-solid border-white border-opacity-40 rounded-[4px]"
-          style={{ color: "#479DF8" }}
-          onClick={() => {
-            toggleWalletSidebar();
-          }}
-        >
-          <h1 className="text-sm font-normal text-white font-work_sans">
-            Change
-          </h1>
-        </button> */}
-        <button
-          onClick={() => {
-            connector.deactivate();
-            toggleWalletSidebar();
-          }}
-          className="w-28 h-9 border border-solid border-white border-opacity-40 rounded-[4px]"
-        >
-          <h1 className="text-sm font-normal text-white font-work_sans">
-            Disconnect
-          </h1>
-        </button>
+    <div className="space-y-3 text-white">
+      <div className="space-y-3">
+        <ModalHeader title="Account" onClose={toggleWalletModal} />
+        <div className="space-y-3">
+          <div className="flex flex-col">
+            {formatConnectorName()}
+            <div className="flex space-x-3">
+              <button
+                className="text-sm font-bold"
+                onClick={() => {
+                  console.log(connector);
+                  connector.deactivate();
+                }}
+              >
+                Disconnect
+              </button>
+
+              <button
+                className="text-sm font-bold"
+                onClick={() => {
+                  openOptions();
+                }}
+              >
+                Change
+              </button>
+            </div>
+          </div>
+          <div
+            id="web3-account-identifier-row"
+            className="flex flex-col justify-center space-y-3"
+          >
+            {ENSName ? (
+              <div className="bg-dark-800">
+                {getStatusIcon()}
+                <p>{ENSName}</p>
+              </div>
+            ) : (
+              <div className="flex py-2 rounded bg-dark-800">
+                <p className="pr-2">{account && shortenAddress(account)}</p>
+                {"   "}
+                {getStatusIcon()}
+              </div>
+            )}
+            <div>
+              <p className="font-bold">
+                Balance: {numberWithCommas(parseFloat(luxBalance).toFixed(2))}{" "}
+                LUX
+              </p>
+            </div>
+            <div className="flex items-center gap-2 space-x-3">
+              {chainId && account && (
+                <a
+                  color="blue"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={
+                    chainId &&
+                    getExplorerLink(chainId, ENSName || account, "address")
+                  }
+                >
+                  <p>View on explorer</p>
+                </a>
+              )}
+              {account && <Copy text="Copy Address" address={account} />}
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-x-3">
-        <div className="w-16 h-16 rounded-full bg-redish"></div>
-        <div>
-          <div className="flex items-center gap-x-2">
-            <h1
-              className="text-lg font-normal text-white font-work_sans"
-              style={{
-                background: isCopied && "#1A1919",
-              }}
-            >
-              {shortenAddress(account)}
-            </h1>
+      <div className="space-y-2">
+        {/* <div className="flex items-center justify-between">
+          <p>Recent Transactions</p>
+          <div>
             <button
-              onClick={() => handleCopyClick(account)}
-              className="outline-none"
+            // onClick={clearAllTransactionsCallback}
             >
-              <CopyIcon />
+              Clear all
             </button>
           </div>
-          <h1 className="text-base font-normal text-white font-work_sans text-opacity-70">
-            {getName(connector)}
-          </h1>
-        </div>
-      </div>
-      <div className="flex gap-x-6">
-        <div>
-          <h1 className="text-sm font-normal text-white font-work_sans">
-            Total Balance
-          </h1>
-          <h1 className="text-2xl font-medium text-white font-work_sans">
-            {balances?.[0] ? ` ${formatBalance(balances[0], 18, 3)}` : null} ETH
-          </h1>
-        </div>
-        <div>
-          <Link href="/nft">
-            <button className="flex items-center outline-none gap-x-2">
-              <h1 className="text-sm font-normal text-white font-work_sans">
-                Owned NFTs
-              </h1>
-              <LinkIcon />
-            </button>
-          </Link>
-          <h1 className="text-2xl font-medium text-white font-work_sans">
-            {userNfts.length}
-          </h1>
-        </div>
+        </div> */}
+        {/* {!!pendingTransactions.length || !!confirmedTransactions.length ? (
+          <>
+            {renderTransactions(pendingTransactions)}
+            {renderTransactions(confirmedTransactions)}
+          </>
+        ) : (
+          <Typography variant="sm" className="text-secondary">
+            {i18n._(t`Your transactions will appear here...`)}
+          </Typography>
+        )} */}
       </div>
     </div>
   );
 };
 
-export default AccountDropdown;
+export default AccountDetails;

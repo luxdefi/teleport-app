@@ -7,21 +7,17 @@ import type { Connector } from "@web3-react/types";
 import { getName } from "state/application/HooksProvider";
 
 import useActiveWeb3React from "hooks/useActiveWeb3React";
-const WalletIcon: FC<{ size?: number; src: string; alt: string }> = ({
-  size,
-  src,
-  alt,
-  children,
-}) => {
-  return (
-    <div className="flex flex-row items-end justify-center flex-nowrap md:items-center">
-      <>
-        <Image src={src} alt={alt} width={size} height={size} />
-        {children}
-      </>
-    </div>
-  );
-};
+const WalletIcon: FC<{ size?: number; src: string; alt: string; children? }> =
+  ({ size, src, alt, children }) => {
+    return (
+      <div className="flex flex-row items-end justify-center flex-nowrap md:items-center">
+        <>
+          <Image src={src} alt={alt} width={size} height={size} />
+          {children}
+        </>
+      </div>
+    );
+  };
 
 interface AccountDetailsProps {
   toggleWalletModal: () => void;

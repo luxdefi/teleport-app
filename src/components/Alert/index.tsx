@@ -8,7 +8,7 @@ interface AlertProps {}
 const Alert = (props: AlertProps) => {
   const [message, setMessage] = useState("");
 
-  const notify = (msg: {} | null | undefined) => toast(msg);
+  const notify = (msg: {} | null | undefined | any) => toast(msg);
 
   useEffect(() => {
     setTimeout(() => {

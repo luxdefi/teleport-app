@@ -1,0 +1,23 @@
+import { createAction } from "@reduxjs/toolkit";
+import { Balance, MoralisError, Token, TokenSelect } from "state/types";
+export enum Field {
+  INPUT = "from",
+  OUTPUT = "to",
+}
+export const loading = createAction<boolean>("swap/loading");
+export const fetchTokens = createAction<Token[]>("swap/fetchTokens");
+export const updateCurrentTrade = createAction<null | {
+  to: Token | {};
+  from: Token | {};
+}>("swap/updateCurrentTrade");
+export const updateError = createAction<MoralisError>("swap/updateError");
+export const updateCurrentSelectSide = createAction<"from" | "to">(
+  "swap/updateCurrentSelectSide"
+);
+export const updateCurrentAmount = createAction<TokenSelect>(
+  "swap/updateCurrentAmount"
+);
+export const fetchBalances = createAction<Balance[]>("swap/fetchBalances");
+export const updateCurrentBalances = createAction<TokenSelect>(
+  "swap/updateCurrentBalances"
+);
