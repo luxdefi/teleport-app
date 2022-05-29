@@ -89,7 +89,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   //   initMoralis();
   // }, [chainId]);
   return (
-    <main className="flex flex-col items-center justify-center flex-grow w-full min-h-[120vh]">
+    <main className="flex flex-col items-center justify-center flex-grow w-full h-screen">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
         <head>
           <title>LUX | BRIDGE</title>

@@ -83,26 +83,6 @@ function AppBar(props: { banner?: boolean }): JSX.Element {
                             Swap
                           </a>
                         </Link>
-                        <Link href="/vote" passHref>
-                          <a
-                            id={`vote-nav-link`}
-                            className="p-2 text-baseline text-primary hover:text-green focus:text-high-emphesis md:p-3 whitespace-nowrap"
-                            style={{ letterSpacing: "2px" }}
-                          >
-                            Vote
-                          </a>
-                        </Link>
-
-                        <a
-                          href="https://dex.guru/token/0x3f5919205a01fa0c44e8f4c4ba897629b26b076a-eth"
-                          target="_blank"
-                          rel="noreferrer"
-                          id={`market-nav-link`}
-                          className="p-2 text-baseline text-primary hover:text-green focus:text-high-emphesis md:p-3 whitespace-nowrap"
-                          style={{ letterSpacing: "2px" }}
-                        >
-                          Chart
-                        </a>
                       </div>
                     </div>
                   </div>
@@ -266,25 +246,6 @@ function AppBar(props: { banner?: boolean }): JSX.Element {
                       Swap
                     </a>
                   </Link>
-                  <Link passHref href="/vote">
-                    <a
-                      id={`vote`}
-                      className="p-2 tracking-widest text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
-                      style={{ letterSpacing: "2px" }}
-                    >
-                      Vote
-                    </a>
-                  </Link>
-                  <a
-                    id={`chart`}
-                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
-                    href="https://dex.guru/token/0x3f5919205a01fa0c44e8f4c4ba897629b26b076a-eth"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ letterSpacing: "2px" }}
-                  >
-                    Chart
-                  </a>
 
                   {/* <div className="w-auto flex items-center rounded bg-dark-900 hover:bg-dark-800 p-0.5 whitespace-nowrap text-sm font-bold cursor-pointer select-none pointer-events-auto">
                   {account && chainId && userEthBalance && (

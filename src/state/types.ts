@@ -27,7 +27,8 @@ export interface Token {
     logoURI: string
     name: string
     symbol: string;
-    isNative: boolean
+    isNative: boolean;
+
 }
 export interface TokenList {
     readonly name: string;

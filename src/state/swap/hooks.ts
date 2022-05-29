@@ -27,10 +27,10 @@ export function useGetAvailableTokens(): () => void {
 
   return useCallback(async () => {
     try {
-      const resultTokens = [];
+      const resultTokens: { [chainId in ChainId]?: Token[] } = {};
       dispatch(fetchTokens(resultTokens));
 
-      const from = Object.values(resultTokens).find(
+      const from = Object.values(resultTokens[1]).find(
         (val: any) => val.symbol === "ETH"
       );
       dispatch(

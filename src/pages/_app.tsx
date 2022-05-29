@@ -1,57 +1,69 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { Fragment, FunctionComponent, useEffect } from "react";
-import { NextComponentType, NextPageContext } from "next";
-import Script from "next/script";
+import type { NextPage } from "next";
+import { FunctionComponent } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { store, persistor } from "../state/store";
 import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { useRouter } from "next/router";
+import AppLayout from "layouts/AppLayout";
 import dynamic from "next/dynamic";
+import Head from "next/head";
+import useActiveWeb3React from "hooks/useActiveWeb3React";
+import { ChainId } from "constants/chainIds";
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+  Layout: FunctionComponent;
+  Guard: FunctionComponent;
+};
+
 const HooksProvider = dynamic(
   () => import("../state/application/HooksProvider"),
   { ssr: false }
 );
-function App({
-  Component,
-  pageProps,
-}: AppProps & {
-  Component: NextComponentType<NextPageContext> & {
-    Guard: FunctionComponent;
-    Layout: FunctionComponent;
-    Provider: FunctionComponent;
-  };
-}) {
-  const { pathname, query, locale } = useRouter();
 
-  // Allows for conditionally setting a provider to be hoisted per page
-  const Provider = Component.Provider || Fragment;
+const useEagerWalletConnect = () => {
+  const { chainId, connector } = useActiveWeb3React();
+  console.log("useEagerWalletConnect", chainId);
+  useEffect(() => {
+    if (chainId) {
+      const isRinkeby = chainId === ChainId.RINKEBY;
+      const isMainnet = chainId === ChainId.MAINNET;
 
-  // Allows for conditionally setting a layout to be hoisted per page
+      if (isRinkeby || isMainnet) {
+        connector.activate(chainId);
+      } else {
+        connector.activate(chainId);
+        // connector.deactivate();
+      }
+    } else {
+      connector.activate();
+    }
+  }, [chainId, connector]);
+};
 
-  // Allows for conditionally setting a guard to be hoisted per page
-  const Guard = Component.Guard || Fragment;
+const GlobalHooks = () => {
+  useEagerWalletConnect();
+  return null;
+};
 
+function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
-      <Script id="gtag-init" strategy="lazyOnload">
-        {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_TAG_ID}', {
-        page_path: window.location.pathname,
-      });
-  `}
-      </Script>
-
-      <Script
-        strategy="lazyOnload"
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_TAG_ID}`}
-      />
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+          integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+          crossOrigin="anonymous"
+        />
+      </Head>
 
       <ReduxProvider store={store}>
         <PersistGate
@@ -70,12 +82,13 @@ function App({
           }
           persistor={persistor}
         >
-          <></>
           <HooksProvider>
-            <Guard>
+            <></>
+            <GlobalHooks />
+            <AppLayout>
               <Component {...pageProps} />
-              <ToastContainer />
-            </Guard>
+            </AppLayout>
+            <ToastContainer />
           </HooksProvider>
         </PersistGate>
       </ReduxProvider>
