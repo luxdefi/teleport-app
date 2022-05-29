@@ -28,28 +28,28 @@ const HooksProvider = dynamic(
   { ssr: false }
 );
 
-const useEagerWalletConnect = () => {
-  const { chainId, connector } = useActiveWeb3React();
-  console.log("useEagerWalletConnect", chainId);
-  useEffect(() => {
-    if (chainId) {
-      const isRinkeby = chainId === ChainId.RINKEBY;
-      const isMainnet = chainId === ChainId.MAINNET;
+// const useEagerWalletConnect = () => {
+//   const { chainId, connector } = useActiveWeb3React();
+//   console.log("useEagerWalletConnect", chainId);
+//   useEffect(() => {
+//     if (chainId) {
+//       const isRinkeby = chainId === ChainId.RINKEBY;
+//       const isMainnet = chainId === ChainId.MAINNET;
 
-      if (isRinkeby || isMainnet) {
-        connector.activate(chainId);
-      } else {
-        connector.activate(chainId);
-        // connector.deactivate();
-      }
-    } else {
-      connector.activate();
-    }
-  }, [chainId, connector]);
-};
+//       if (isRinkeby || isMainnet) {
+//         connector.activate(chainId);
+//       } else {
+//         connector.activate(chainId);
+//         // connector.deactivate();
+//       }
+//     } else {
+//       connector.activate();
+//     }
+//   }, [chainId, connector]);
+// };
 
 const GlobalHooks = () => {
-  useEagerWalletConnect();
+  // useEagerWalletConnect();
   return null;
 };
 

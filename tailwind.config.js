@@ -9,30 +9,18 @@ module.exports = {
   //   purgeLayersByDefault: true,
   //   applyComplexClasses: true,
   // },
-  purge: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-    "./layouts/**/*.{js,ts,jsx,tsx}",
-  ],
+  purge: ["./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: false,
   theme: {
     extend: {
-      margin: {
-        "5em": "5em",
-      },
       linearBorderGradients: {
         directions: {
           tr: "to top right",
           r: "to right",
-          t: "to top",
-          b: "to bottom",
         },
         colors: {
-          "pink-purple": ["#D954D1", "#B06FEC"],
           "blue-pink": ["#27B0E6", "#FA52A0"],
           "pink-red-light-brown": ["#FE5A75", "#FEC464"],
-          "purple-blue": ["#462CA9", "#2517FF"],
-          "blue-green": ["#2517FF", "#15F195"],
         },
         background: {
           "dark-1000": "#0D0415",
@@ -47,44 +35,41 @@ module.exports = {
           4: "4px",
         },
       },
-      backgroundImage: {
-        "marketplace-section": "url(/img/leaves.png)",
-        "nft-gradient":
-          "linear-gradient(180deg, #2517FF -61.88%, #15F195 131.19%)",
-        "leader-board": "linear-gradient(180deg, #4B31AC 0%, #2703F8 100%)",
-      },
       colors: {
-        footer: "#140A17",
-        black: "#000000",
-        accent: "#D954D1",
-        secondary: "#DADCDF",
-        pink: "#D954D1",
-        purple: "#B06FEC",
-        redish: "#EE2A56",
-        grey1: "#F5FBF2",
-        grey2: "#333333",
-        grey3: "#9D9D9D",
-        dark: "#1A1919",
-        dark1: "#211822",
-        dark11: "#262626",
-        dark2: "#372839",
-        dark3: "#413343",
+        purple: "#a755dd",
+        blue: "#0993ec",
+        pink: "#f338c3",
+        green: "#7cff6b",
+        red: "crimson",
+        yellow: "#ffd166",
+
+        "opaque-blue": "#0993ec80",
+        "opaque-pink": "#f338c380",
+        "pink-red": "#FE5A75",
+        "light-brown": "#FEC464",
+        "light-yellow": "#FFD166",
+        "cyan-blue": "#0993EC",
+        "dark-pink": "#221825",
+        "dark-blue": "#0F182A",
+        "dark-1000": "#0D0415",
+        "dark-900": "#161522",
+        "dark-850": "#1d1e2c",
+        "dark-800": "#202231",
+        "dark-700": "#2E3348",
+        "dark-600": "#1C2D49",
+        "dark-500": "#223D5E",
+        "low-emphesis": "#575757",
+        primary: "#BFBFBF",
+        secondary: "#7F7F7F",
+        "high-emphesis": "#E3E3E3",
       },
       lineHeight: {
         "48px": "48px",
       },
       fontFamily: {
         sans: ["DM Sans", ...defaultTheme.fontFamily.sans],
-        work_sans: ["Work Sans", "sans-serif"],
-        object_sans: ["Object Sans", "sans-serif"],
       },
       fontSize: {
-        label: [
-          "12px",
-          {
-            fontWeight: "bold",
-          },
-        ],
         hero: [
           "48px",
           {
@@ -115,17 +100,15 @@ module.exports = {
         "3px": "3px",
       },
       minHeight: {
-        5: "1.25rem",
         empty: "128px",
         cardContent: "230px",
         fitContent: "fit-content",
-        nftContainer: "503px",
+      },
+      minHeight: {
+        5: "1.25rem",
       },
       minWidth: {
         5: "1.25rem",
-      },
-      maxWidth: {
-        22: "22.06rem",
       },
       dropShadow: {
         currencyLogo: "0px 3px 6px rgba(15, 15, 15, 0.25)",
@@ -148,10 +131,6 @@ module.exports = {
           "0%": { opacity: 0 },
           "100%": { opacity: 100 },
         },
-      },
-      zIndex: {
-        100: "100",
-        999: "999",
       },
     },
   },
