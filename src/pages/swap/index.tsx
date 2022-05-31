@@ -1,5 +1,6 @@
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   useFetchUserBalances,
   useGetAvailableTokens,
@@ -22,6 +23,9 @@ import Exchange from "components/Swap/Exchange";
 import Lottie from "lottie-react";
 import { useWalletModalToggle } from "state/application/hooks";
 import { ChainId } from "constants/chainIds";
+import Head from "next/head";
+import TransactionDetail from "components/Swap/TransactionDetail";
+import CustomizedSteppers from "components/Stepper";
 
 interface SwapProps {}
 
@@ -89,18 +93,18 @@ const Swap: React.FC<SwapProps> = ({}) => {
   //   initMoralis();
   // }, [chainId]);
   return (
-    <main className="flex flex-col items-center justify-center flex-grow w-full h-screen">
+    <main className="flex flex-col items-center justify-center flex-grow w-full h-full mt-24">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
-        <head>
+        <Head>
           <title>LUX | BRIDGE</title>
           <meta
             key="description"
             name="description"
             content="LUX BRIDGE Multi-chain swap"
           />
-        </head>
+        </Head>
 
-        <div className="p-4 space-y-4 rounded-3xl bg-space-grey z-1">
+        <div className="p-4 space-y-4 rounded-3xl bg-primary z-1 mb-7">
           {/* Add slippage */}
           <SwapHeader
             input={currentTrade[Field.INPUT]}
@@ -148,21 +152,28 @@ const Swap: React.FC<SwapProps> = ({}) => {
               }
               id="swap-currency-input"
             />
-            <div className="grid py-3">
-              <div className="flex flex-wrap justify-center w-full px-4">
+            <div className="grid py-3 relative">
+              <hr className="h-px bg-[#323546] opacity-30 block absolute w-full top-[50%] z-[1]" />
+              <div className="flex flex-wrap justify-center w-full px-4 z-10">
                 <button
                   className="-mt-6 -mb-6 rounded-full"
                   onClick={() => {
                     onSwitchTokens();
                   }}
                 >
-                  <div className="p-1 rounded-full bg-dark-900">
+                  <div className="p-1 rounded-full bg-secondary">
                     <div
-                      className="p-3 rounded-full bg-dark-800 hover:bg-dark-700"
+                      className="py-1 rounded-full flex flex-col justify-center"
                       onMouseEnter={() => setAnimateSwapArrows(true)}
                       onMouseLeave={() => setAnimateSwapArrows(false)}
                     >
-                      Arrow
+                      <Image
+                        src="/icons/swithcer.svg"
+                        alt=""
+                        width={30}
+                        height={30}
+                        className="stroke-white"
+                      />
                     </div>
                   </div>
                 </button>
@@ -199,17 +210,18 @@ const Swap: React.FC<SwapProps> = ({}) => {
               />
             </div>
           </div>
+          <CustomizedSteppers />
           <div className="mt-1">
             {!account ? (
               <div
-                className="w-full px-6 py-4 text-base text-center border rounded shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-vote-button bg-opacity-80 text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={toggleWalletModal}
               >
                 Connect Wallet
               </div>
             ) : (
               <button
-                className="w-full px-6 py-4 text-base text-center border rounded shadow-sm focus:ring- focus:ring-offset- bg-vote-button bg-opacity-80 text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={() => {
                   swapTokens();
                 }}
@@ -230,6 +242,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
           </div>
           {/* <UnsupportedCurrencyFooter show={swapIsUnsupported} currentTrade={[currentTrade.INPUT, currentTrade.OUTPUT]} /> */}
         </div>
+        <TransactionDetail />
       </div>
     </main>
   );

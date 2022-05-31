@@ -1,5 +1,6 @@
 import NavLink from "components/NavLink";
 import { formatBalance, numberWithCommas } from "functions/format";
+import Image from "next/image";
 
 import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
@@ -49,8 +50,8 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({
           }}
           passHref
         >
-          <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md text-secondary hover:text-high-emphesis">
-            Swap
+          <a className="flex items-center justify-center px-4 font-medium text-center rounded-md text-white text-lg  hover:text-high-emphesis">
+            Cross-Chain Swaps for 15,000+ Assets
           </a>
         </Link>
       </div>
@@ -76,7 +77,8 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({
           </div> */}
 
           <div className="relative flex items-center w-full h-full text-sm font-bold text-gray-500 rounded">
-            {numberWithCommas(luxBalance.toFixed(2))} lux
+            {/* {numberWithCommas(luxBalance.toFixed(2))} lux */}
+            <Image src="/icons/filter.svg" alt="" width={20} height={20} />
           </div>
           <div className="relative flex items-center w-full h-full rounded hover:bg-dark-800">
             {/* <Settings placeholderSlippage={allowedSlippage} /> */}

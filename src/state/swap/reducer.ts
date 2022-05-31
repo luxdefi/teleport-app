@@ -17,8 +17,8 @@ interface SwapState {
   loading: boolean;
   tokens: { [chainId in ChainId]?: Token[] };
   currentTrade: null | {
-    to: Token | {};
-    from: Token | {};
+    to: Token | {} | null;
+    from: Token | {} | null;
   };
   error: MoralisError | null;
   currentSelectSide: "from" | "to";
@@ -30,22 +30,24 @@ const initialState: SwapState = {
   loading: false,
   tokens: {},
   currentTrade: {
-    to: {
-      decimals: 18,
-      symbol: "LUX",
-      address: "0x3f5919205A01fa0c44E8F4C4Ba897629b26B076a",
-      logoURI: "/lux_logo.svg",
-      name: "LUX",
-      isNative: false,
-    },
-    from: {
-      decimals: 18,
-      symbol: "ETH",
-      address: "",
-      logoURI: "",
-      name: "Ethereum",
-      isNative: true,
-    },
+    // to: {
+    //   decimals: 18,
+    //   symbol: "LUX",
+    //   address: "0x3f5919205A01fa0c44E8F4C4Ba897629b26B076a",
+    //   logoURI: "/lux_logo.svg",
+    //   name: "LUX",
+    //   isNative: false,
+    // },
+    // from: {
+    //   decimals: 18,
+    //   symbol: "ETH",
+    //   address: "",
+    //   logoURI: "/images/networks/mainnet-network.jpg",
+    //   name: "Ethereum",
+    //   isNative: true,
+    // },
+    to: null,
+    from: null,
   },
   error: null,
   currentSelectSide: "from",

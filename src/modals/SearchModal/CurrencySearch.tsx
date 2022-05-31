@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 import React, {
   KeyboardEvent,
   RefObject,
@@ -29,6 +31,7 @@ import {
   NETWORK_ICON,
   NETWORK_LABEL,
 } from "config/networks";
+import Image from "next/image";
 interface CurrencySearchProps {
   isOpen: boolean;
   onDismiss: () => void;
@@ -72,6 +75,8 @@ export function CurrencySearch({
 
   let allTokens = useAllTokens();
   const history = useRouter();
+
+  console.log("allTokens", allTokens);
 
   // if (currencyList) {
   //   allTokens = Object.keys(allTokens).reduce((obj, key) => {
@@ -180,41 +185,47 @@ export function CurrencySearch({
   return (
     <div className="flex flex-col">
       <ModalHeader
-        title="Select a token"
+        title="Token List"
         titleClassName="text-white text-2xl font-semibold"
         className="px-6 py-5 bg-space-grey"
         onClose={onDismiss}
       />
-      <div className="flex h-full flex-col pr-6 min-w-[82vw] md:min-w-[400px]">
+      <div className="flex h-full flex-col pl-6 pr-6 min-w-[82vw] md:min-w-[400px]">
         {!currencyList && (
-          <div className="pl-6 mt-0 mb-3 sm:mt-3 sm:mb-8">
-            <input
-              type="text"
-              id="token-search-input"
-              placeholder="Search name or paste address"
-              autoComplete="off"
-              value={searchQuery}
-              ref={inputRef as RefObject<HTMLInputElement>}
-              onChange={handleInput}
-              onKeyDown={handleEnter}
-              className="w-full bg-transparent border border-dark-700 focus:outline-none rounded placeholder-secondary focus:placeholder-primary font-bold text-base px-6 py-3.5"
-            />
+          <div className=" mt-0 mb-3 sm:mt-3 sm:mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 max-w-[40px] flex items-center justify-start pl-5">
+                <Image src="/icons/search.svg" alt="" width={14} height={14} />
+              </div>
+              <input
+                type="text"
+                id="token-search-input"
+                placeholder="Search name or paste address"
+                autoComplete="off"
+                value={searchQuery}
+                ref={inputRef as RefObject<HTMLInputElement>}
+                onChange={handleInput}
+                onKeyDown={handleEnter}
+                className="w-full bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-11 px-6 py-3.5"
+              />
+            </div>
           </div>
         )}
 
         <div className="flex h-full">
-          <div className="flex flex-wrap w-1/4 bg-dark-800 max-h-[inherit]">
+          <div className="flex flex-wrap w-[28%] bg-dark-300 max-h-[396px] overflow-y-auto rounded-2xl px-1">
             {AVAILABLE_NETWORKS.map((network: number) => (
               <div
+                key={network}
                 onClick={() => {
                   setSelectedNetwork(network);
                 }}
-                className="flex flex-col items-center justify-center w-1/2 p-2 cursor-pointer "
+                className="flex flex-col items-center justify-center w-1/2 py-1.5 px-3 cursor-pointer "
               >
                 <div
                   className={`flex flex-col items-center justify-center w-16 h-16 rounded ${
-                    selectedNetwork === network && "border"
-                  } bg-dark-700 border-primary`}
+                    selectedNetwork === network && "border-2"
+                  } bg-dark-700 border-primary-300`}
                 >
                   <img
                     className="w-8 h-8 rounded-full"
