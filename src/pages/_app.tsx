@@ -13,6 +13,8 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import { ChainId } from "constants/chainIds";
+import { MoralisProvider } from "react-moralis";
+
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
 };
@@ -64,34 +66,39 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
           crossOrigin="anonymous"
         />
       </Head>
-
-      <ReduxProvider store={store}>
-        <PersistGate
-          loading={
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                top: "0",
-                left: "0",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <div className=""></div>
-            </div>
-          }
-          persistor={persistor}
-        >
-          <HooksProvider>
-            <></>
-            <GlobalHooks />
-            <AppLayout>
-              <Component {...pageProps} />
-            </AppLayout>
-            <ToastContainer />
-          </HooksProvider>
-        </PersistGate>
-      </ReduxProvider>
+      <MoralisProvider /* cspell: disable-line */
+        appId="ILIieVqZyWlL0ErAjiG9L1X6fep2KEFkKczcGOmJ"
+        serverUrl="https://hyrix9h7cyfi.usemoralis.com:2053/server"
+        // initializeOnMount={false}
+      >
+        <ReduxProvider store={store}>
+          <PersistGate
+            loading={
+              <div
+                className="absolute flex items-center justify-center"
+                style={{
+                  top: "0",
+                  left: "0",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <div className=""></div>
+              </div>
+            }
+            persistor={persistor}
+          >
+            <HooksProvider>
+              <></>
+              <GlobalHooks />
+              <AppLayout>
+                <Component {...pageProps} />
+              </AppLayout>
+              <ToastContainer />
+            </HooksProvider>
+          </PersistGate>
+        </ReduxProvider>
+      </MoralisProvider>
     </>
   );
 }

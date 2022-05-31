@@ -22,12 +22,14 @@ import Exchange from "components/Swap/Exchange";
 import Lottie from "lottie-react";
 import { useWalletModalToggle } from "state/application/hooks";
 import { ChainId } from "constants/chainIds";
+import { useMoralis, useMoralisWeb3Api } from "react-moralis";
 
 interface SwapProps {}
 
 const Swap: React.FC<SwapProps> = ({}) => {
   const { chainId, account } = useActiveWeb3React();
   const { loading } = useSelector((state: any) => state.swap);
+  const { Moralis, initialize } = useMoralis();
 
   const dispatch = useDispatch();
   const toggleWalletModal = useWalletModalToggle();
@@ -46,7 +48,28 @@ const Swap: React.FC<SwapProps> = ({}) => {
     currentSelectSide,
     balances,
   } = useAppSelector((state: AppState) => state.swap);
-
+  const initMoralis = async () => {
+    console.log("chainId", chainId);
+    if (chainId) {
+      try {
+        // await Moralis.initialize(
+        //   chainId === 1
+        //     ? "ymNzrS4sfW7UYvZUaZdeUFl7V90mcuATGCqUmeXF"
+        //     : "LlvDSAdeEIS9cvxDfczemAQS34Vt6jQJaIT9yqUa",
+        //   chainId === 1
+        //     ? "https://1edmqxbr7p3s.usemoralis.com:2053/server"
+        //     : "https://9tope9dcqe7s.usemoralis.com:2053/server"
+        // );
+        await Moralis.initPlugins();
+        await Moralis.enableWeb3();
+        getAvailableTokens();
+        fetchUserBalances();
+        if (!Moralis.User.current()) await Moralis.authenticate();
+      } catch (error) {
+        console.log("error in init", error);
+      }
+    }
+  };
   useEffect(() => {
     if (currentTrade) {
       getCurrentBalances();
