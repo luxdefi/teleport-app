@@ -50,7 +50,7 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({
           }}
           passHref
         >
-          <a className="flex items-center justify-center px-4 font-medium text-center rounded-md text-white text-lg  hover:text-high-emphesis">
+          <a className="flex items-center justify-center font-medium text-center rounded-md text-white text-lg  hover:text-high-emphesis">
             Cross-Chain Swaps for 15,000+ Assets
           </a>
         </Link>

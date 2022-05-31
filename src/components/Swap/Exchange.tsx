@@ -76,7 +76,7 @@ export default function ExchangePanel({
   return (
     <div
       id={id}
-      className={`${hideInput ? "p-4" : "p-5"} rounded bg-space-dark`}
+      className={`${hideInput ? "py-4" : "py-5"} rounded bg-space-dark`}
     >
       <div className="flex flex-col justify-between space-y-3">
         <div className={"w-full flex items-center justify-between"}>

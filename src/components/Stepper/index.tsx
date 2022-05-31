@@ -142,20 +142,22 @@ const steps = ["Uniswap V3", "Lux", "Livepeer"];
 
 export default function CustomizedSteppers() {
   return (
-    <Stack sx={{ width: "100%", margin: 0 }} spacing={4}>
-      <Stepper
-        alternativeLabel
-        activeStep={steps.length - 1}
-        connector={<ColorlibConnector />}
-      >
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel StepIconComponent={ColorlibStepIcon}>
-              <p className="text-white font-semibold text-base">{label}</p>
-            </StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-    </Stack>
+    <div style={{ width: "100%", marginBottom: 24, marginTop: 50 }}>
+      <Stack sx={{ width: "100%" }} spacing={4}>
+        <Stepper
+          alternativeLabel
+          activeStep={steps.length - 1}
+          connector={<ColorlibConnector />}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel StepIconComponent={ColorlibStepIcon}>
+                <p className="text-white font-semibold text-base">{label}</p>
+              </StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Stack>
+    </div>
   );
 }

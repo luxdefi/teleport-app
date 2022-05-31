@@ -104,12 +104,14 @@ const Swap: React.FC<SwapProps> = ({}) => {
           />
         </Head>
 
-        <div className="p-4 space-y-4 rounded-3xl bg-primary z-1 mb-7">
+        <div className="py-6 space-y-4 rounded-3xl bg-primary z-1 mb-7">
           {/* Add slippage */}
-          <SwapHeader
-            input={currentTrade[Field.INPUT]}
-            output={currentTrade[Field.OUTPUT]}
-          />
+          <div className="px-5">
+            <SwapHeader
+              input={currentTrade[Field.INPUT]}
+              output={currentTrade[Field.OUTPUT]}
+            />
+          </div>
           {/* <ConfirmSwapModal
                 isOpen={showConfirm}
                 trade={trade}
@@ -124,34 +126,36 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 onDismiss={handleConfirmDismiss}
                 minerBribe={doArcher ? archerETHTip : undefined}
               /> */}
-          <div>
-            <Exchange
-              // priceImpact={priceImpact}
-              label={`Swap From:`}
-              selectedCurrencyBalance={currentBalances[Field.INPUT]}
-              value={currentAmount[Field.INPUT]}
-              showMaxButton={true}
-              token={currentTrade[Field.INPUT]}
-              onUserInput={handleChange}
-              onMax={() =>
-                handleChange(currentBalances[Field.INPUT], Field.INPUT)
-              }
-              // fiatValue={fiatValueInput ?? undefined}
-              onCurrencySelect={(token) =>
-                dispatch(
-                  updateCurrentTrade({
-                    ...currentTrade,
-                    from: { ...token, isNative: token.symbol === "ETH" },
-                  })
-                )
-              }
-              otherToken={currentTrade[Field.OUTPUT]}
-              showCommonBases={true}
-              onKeyDownFunc={() =>
-                dispatch(updateCurrentSelectSide(Field.INPUT))
-              }
-              id="swap-currency-input"
-            />
+          <div className="mb-12">
+            <div className="px-5">
+              <Exchange
+                // priceImpact={priceImpact}
+                label={`Swap From:`}
+                selectedCurrencyBalance={currentBalances[Field.INPUT]}
+                value={currentAmount[Field.INPUT]}
+                showMaxButton={true}
+                token={currentTrade[Field.INPUT]}
+                onUserInput={handleChange}
+                onMax={() =>
+                  handleChange(currentBalances[Field.INPUT], Field.INPUT)
+                }
+                // fiatValue={fiatValueInput ?? undefined}
+                onCurrencySelect={(token) =>
+                  dispatch(
+                    updateCurrentTrade({
+                      ...currentTrade,
+                      from: { ...token, isNative: token.symbol === "ETH" },
+                    })
+                  )
+                }
+                otherToken={currentTrade[Field.OUTPUT]}
+                showCommonBases={true}
+                onKeyDownFunc={() =>
+                  dispatch(updateCurrentSelectSide(Field.INPUT))
+                }
+                id="swap-currency-input"
+              />
+            </div>
             <div className="grid py-3 relative">
               <hr className="h-px bg-[#323546] opacity-30 block absolute w-full top-[50%] z-[1]" />
               <div className="flex flex-wrap justify-center w-full px-4 z-10">
@@ -180,7 +184,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
               </div>
             </div>
 
-            <div>
+            <div className="px-5">
               <Exchange
                 // priceImpact={priceImpact}
                 label={`Swap To:`}
@@ -210,8 +214,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
               />
             </div>
           </div>
-          <CustomizedSteppers />
-          <div className="mt-1">
+          {/* <CustomizedSteppers /> */}
+          <div className="mt-1 px-5">
             {!account ? (
               <div
                 className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 const TransactionDetail = () => {
   const [show, setShow] = useState(true);
   return (
-    <div className="w-full rounded-3xl bg-primary">
+    <div className="w-full rounded-3xl bg-primary text-white">
       <div
         className={`flex items-center justify-center py-5 cursor-pointer ${
           show && "border-b border-grey-50"
@@ -51,7 +51,10 @@ const TransactionDetail = () => {
           <div className="flex flex-col p-5 cursor-pointer">
             <div className="flex items-center justify-between">
               <p>You will receive Polygon tokens at this address</p>
-              <p>0x997...e41a4</p>
+              <div className="flex items-center cursor-pointer">
+                <p className="mr-8">0x997...e41a4</p>
+                <Image src="/icons/copy.svg" alt="" width={16} height={16} />
+              </div>
             </div>
           </div>
         </>
