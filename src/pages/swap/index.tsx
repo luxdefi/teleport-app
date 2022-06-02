@@ -310,7 +310,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     label: "Lux",
                     sublabel: "Smart Routing",
                     icon: 2,
-                    logo: "/icons/lux.png",
+                    logo: "/icons/lux-logo.svg",
                   },
                   {
                     label: "Livepeer",
