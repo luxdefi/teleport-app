@@ -52,7 +52,15 @@ function ColorlibStepIcon(props: StepIconProps & { steps: any }) {
   const icons: { [index: string]: React.ReactElement } = steps?.reduce(
     (acc, _, i) => ({
       ...acc,
-      [i + 1]: <Image src={`${_.logo}`} alt="" width={40} height={40} />,
+      [i + 1]: (
+        <Image
+          src={`${_.logo}`}
+          alt=""
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+      ),
     }),
     {}
   );
