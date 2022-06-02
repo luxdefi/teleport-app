@@ -28,6 +28,7 @@ import TransactionDetail from "components/Swap/TransactionDetail";
 import CustomizedSteppers from "components/Stepper";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
+import { NETWORK_LABEL } from "config/networks";
 
 interface SwapProps {}
 
@@ -324,6 +325,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 {loading ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
+                ) : chainId !== chainId ? (
+                  `switch to ${NETWORK_LABEL[chainId]} network`
                 ) : error ? (
                   error.description
                 ) : (

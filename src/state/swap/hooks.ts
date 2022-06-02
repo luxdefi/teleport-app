@@ -15,6 +15,7 @@ import {
   updateCurrentBalances,
   updateCurrentTrade,
   updateError,
+  updateActiveChain,
   loading,
 } from "./action";
 import { notify } from "components/alertMessage";
@@ -27,11 +28,13 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   const activeChain: number = useSelector(
     (state: AppState) => state.swap.activeChain
   );
+  const aChain = useSelector((state: AppState) => state.swap);
   const chainAddresses: { LUX: string } =
     (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
   const dispatch = useDispatch();
   const { Moralis } = useMoralis();
 
+  console.log("activeChainToFetch", activeChain, aChain);
   return useCallback(async () => {
     try {
       const result: { tokens: Token[] } =
@@ -65,7 +68,7 @@ export function useGetAvailableTokens(): (chain?: number) => void {
     } catch (error) {
       console.log("error in useGetAvailableTokens", error);
     }
-  }, [dispatch, chainId]);
+  }, [Moralis.Plugins.oneInch, activeChain, chainAddresses.LUX, dispatch]);
   // const supported_networks = SUPPORTED_NETWORKS;
   // const native = NATIVE;
   // console.log("chainId ==>", native, supported_networks);
@@ -103,6 +106,23 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   //   },
   //   [native, supported_networks, chainId, Moralis.Plugins.oneInch, dispatch]
   // );
+}
+
+export function useUpdateActiveChain(): (chain: ChainId) => void {
+  const dispatch = useDispatch();
+  return useCallback(
+    (chain: number) => {
+      // dispatch(updateCurrentTrade({}));
+      // dispatch(updateCurrentAmount({}));
+      // dispatch(updateCurrentBalances({}));
+      // dispatch(fetchBalances({}));
+      // dispatch(updateError({}));
+      // dispatch(loading({}));
+      // dispatch(fetchTokens({}));
+      dispatch(updateActiveChain(chain));
+    },
+    [dispatch]
+  );
 }
 
 export function useFetchUserBalances(): () => void {

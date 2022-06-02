@@ -101,13 +101,15 @@ export function CurrencySearch({
 
   const filteredTokens: Token[] = useMemo(() => {
     return filterTokens(
-      Object.values(allTokens["tokens"] ?? allTokens),
+      Object.values(Object.values(allTokens)[0]),
       debouncedQuery
     );
   }, [allTokens, debouncedQuery]);
+
   const sortedTokens: Token[] = useMemo(() => {
-    return filteredTokens.sort(tokenComparator);
-  }, [filteredTokens, tokenComparator]);
+    // return filteredTokens.sort(tokenComparator);
+    return filteredTokens;
+  }, [filteredTokens]);
 
   const filteredSortedTokens = useSortedTokensByQuery(
     sortedTokens,

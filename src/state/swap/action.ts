@@ -6,7 +6,8 @@ export enum Field {
   OUTPUT = "to",
 }
 export const loading = createAction<boolean>("swap/loading");
-export const fetchTokens = createAction<{ [chainId in ChainId]?: Token[] }>("swap/fetchTokens");
+export const fetchTokens =
+  createAction<{ [chainId in ChainId]?: Token[] }>("swap/fetchTokens");
 export const updateCurrentTrade = createAction<null | {
   to: Token | {};
   from: Token | {};
@@ -21,4 +22,7 @@ export const updateCurrentAmount = createAction<TokenSelect>(
 export const fetchBalances = createAction<Balance[]>("swap/fetchBalances");
 export const updateCurrentBalances = createAction<TokenSelect>(
   "swap/updateCurrentBalances"
+);
+export const updateActiveChain = createAction<ChainId>(
+  "swap/updateActiveChain"
 );
