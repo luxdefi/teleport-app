@@ -130,7 +130,7 @@ const SlippageModal = ({
 }) => {
   return (
     <div
-      className={`absolute right-0 top-12 z-50 px-4 py-3 bg-[#161827] rounded-xl transition-transform ${
+      className={`absolute right-0 top-12 z-50 px-4 py-3 bg-black rounded-xl transition-transform ${
         !isSlipToleranceModal
           ? "scale-0 opacity-0 pointer-events-none"
           : "scale-100 opacity-100 pointer-events-auto"
