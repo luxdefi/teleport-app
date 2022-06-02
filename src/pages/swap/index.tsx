@@ -1,5 +1,6 @@
 import useActiveWeb3React from "hooks/useActiveWeb3React";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import {
   useFetchUserBalances,
   useGetAvailableTokens,
@@ -22,7 +23,11 @@ import Exchange from "components/Swap/Exchange";
 import Lottie from "lottie-react";
 import { useWalletModalToggle } from "state/application/hooks";
 import { ChainId } from "constants/chainIds";
-import { useMoralis, useMoralisWeb3Api } from "react-moralis";
+import Head from "next/head";
+import TransactionDetail from "components/Swap/TransactionDetail";
+import CustomizedSteppers from "components/Stepper";
+import { useMoralis } from "react-moralis";
+import { useRouter } from "next/router";
 
 interface SwapProps {}
 
@@ -39,6 +44,30 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const swapTokens = useSwap();
   const getQuote = useGetQuote();
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false);
+  const router = useRouter();
+  // get query
+  const query = router.query;
+  // console.log("app_query", query?.toChain, query?.fromChain);
+
+  const fromChain = (str: string) => {
+    router.query.fromChain = str.toUpperCase();
+    router.push(router);
+  };
+
+  const toChain = (str: string) => {
+    router.query.toChain = str.toUpperCase();
+    router.push(router);
+  };
+
+  const to = (str: string) => {
+    router.query.to = str.toUpperCase();
+    router.push(router);
+  };
+
+  const from = (str: string) => {
+    router.query.from = str.toUpperCase();
+    router.push(router);
+  };
 
   const {
     currentAmount,
@@ -48,28 +77,32 @@ const Swap: React.FC<SwapProps> = ({}) => {
     currentSelectSide,
     balances,
   } = useAppSelector((state: AppState) => state.swap);
-  const initMoralis = async () => {
-    console.log("chainId", chainId);
-    if (chainId) {
-      try {
-        // await Moralis.initialize(
-        //   chainId === 1
-        //     ? "ymNzrS4sfW7UYvZUaZdeUFl7V90mcuATGCqUmeXF"
-        //     : "LlvDSAdeEIS9cvxDfczemAQS34Vt6jQJaIT9yqUa",
-        //   chainId === 1
-        //     ? "https://1edmqxbr7p3s.usemoralis.com:2053/server"
-        //     : "https://9tope9dcqe7s.usemoralis.com:2053/server"
-        // );
-        await Moralis.initPlugins();
-        await Moralis.enableWeb3();
-        getAvailableTokens();
-        fetchUserBalances();
-        if (!Moralis.User.current()) await Moralis.authenticate();
-      } catch (error) {
-        console.log("error in init", error);
+
+  // useEffect(() => {
+  //   getAvailableTokens();
+  // }, [getAvailableTokens]);
+
+  const initMoralis = useCallback(() => {
+    async () => {
+      console.log("chainId", chainId);
+      if (chainId) {
+        try {
+          await Moralis.initPlugins();
+          await Moralis.enableWeb3();
+          getAvailableTokens();
+          fetchUserBalances();
+          if (!Moralis.User.current()) await Moralis.authenticate();
+        } catch (error) {
+          console.log("error in init", error);
+        }
       }
-    }
-  };
+    };
+  }, [Moralis, chainId, fetchUserBalances, getAvailableTokens]);
+
+  useEffect(() => {
+    initMoralis();
+  }, [chainId, initMoralis]);
+
   useEffect(() => {
     if (currentTrade) {
       getCurrentBalances();
@@ -108,9 +141,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
     };
     dispatch(updateCurrentAmount(newAmount));
   };
-  // useEffect(() => {
-  //   initMoralis();
-  // }, [chainId]);
+
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-screen">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
@@ -125,10 +156,21 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
         <div className="p-4 space-y-4 rounded-3xl bg-space-grey z-1">
           {/* Add slippage */}
-          <SwapHeader
-            input={currentTrade[Field.INPUT]}
-            output={currentTrade[Field.OUTPUT]}
-          />
+          <div className="px-5">
+            <SwapHeader
+              input={currentTrade[Field.INPUT]}
+              output={currentTrade[Field.OUTPUT]}
+              crossChain={query?.fromChain !== query?.toChain}
+              bothSelected={
+                currentTrade.from &&
+                currentTrade.to &&
+                !!query?.fromChain &&
+                !!query?.toChain
+              }
+              fromChain={query?.fromChain as string}
+              toChain={query?.toChain as string}
+            />
+          </div>
           {/* <ConfirmSwapModal
                 isOpen={showConfirm}
                 trade={trade}
@@ -143,36 +185,41 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 onDismiss={handleConfirmDismiss}
                 minerBribe={doArcher ? archerETHTip : undefined}
               /> */}
-          <div>
-            <Exchange
-              // priceImpact={priceImpact}
-              label={`Swap From:`}
-              selectedCurrencyBalance={currentBalances[Field.INPUT]}
-              value={currentAmount[Field.INPUT]}
-              showMaxButton={true}
-              token={currentTrade[Field.INPUT]}
-              onUserInput={handleChange}
-              onMax={() =>
-                handleChange(currentBalances[Field.INPUT], Field.INPUT)
-              }
-              // fiatValue={fiatValueInput ?? undefined}
-              onCurrencySelect={(token) =>
-                dispatch(
-                  updateCurrentTrade({
-                    ...currentTrade,
-                    from: { ...token, isNative: token.symbol === "ETH" },
-                  })
-                )
-              }
-              otherToken={currentTrade[Field.OUTPUT]}
-              showCommonBases={true}
-              onKeyDownFunc={() =>
-                dispatch(updateCurrentSelectSide(Field.INPUT))
-              }
-              id="swap-currency-input"
-            />
-            <div className="grid py-3">
-              <div className="flex flex-wrap justify-center w-full px-4">
+          <div className="mb-12">
+            <div className="px-5">
+              <Exchange
+                // priceImpact={priceImpact}
+                label={`Swap From:`}
+                selectedCurrencyBalance={currentBalances[Field.INPUT]}
+                value={currentAmount[Field.INPUT]}
+                showMaxButton={true}
+                token={currentTrade[Field.INPUT]}
+                onUserInput={handleChange}
+                onMax={() =>
+                  handleChange(currentBalances[Field.INPUT], Field.INPUT)
+                }
+                // fiatValue={fiatValueInput ?? undefined}
+                onCurrencySelect={(token) =>
+                  dispatch(
+                    updateCurrentTrade({
+                      ...currentTrade,
+                      from: { ...token, isNative: token.symbol === "ETH" },
+                    })
+                  )
+                }
+                otherToken={currentTrade[Field.OUTPUT]}
+                showCommonBases={true}
+                onKeyDownFunc={() =>
+                  dispatch(updateCurrentSelectSide(Field.INPUT))
+                }
+                id="swap-currency-input"
+                onChainChange={fromChain}
+                onTokenChange={from}
+              />
+            </div>
+            <div className="grid py-3 relative">
+              <hr className="h-px bg-[#323546] opacity-30 block absolute w-full top-[50%] z-[1]" />
+              <div className="flex flex-wrap justify-center w-full px-4 z-10">
                 <button
                   className="-mt-6 -mb-6 rounded-full"
                   onClick={() => {
@@ -219,10 +266,38 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   dispatch(updateCurrentSelectSide(Field.OUTPUT))
                 }
                 id="swap-currency-output"
+                onChainChange={toChain}
+                onTokenChange={to}
               />
             </div>
           </div>
-          <div className="mt-1">
+          {currentTrade.from &&
+            currentTrade.to &&
+            !!query?.fromChain &&
+            !!query?.toChain &&
+            query?.toChain !== query?.fromChain && (
+              <CustomizedSteppers
+                steps={[
+                  {
+                    label: "Uniswap V3",
+                    icon: 1,
+                    logo: "/icons/uniswap.png",
+                  },
+                  {
+                    label: "Lux",
+                    sublabel: "Smart Routing",
+                    icon: 2,
+                    logo: "/icons/lux.png",
+                  },
+                  {
+                    label: "Livepeer",
+                    icon: 3,
+                    logo: "/icons/livepeer.png",
+                  },
+                ]}
+              />
+            )}
+          <div className="mt-1 px-5">
             {!account ? (
               <div
                 className="w-full px-6 py-4 text-base text-center border rounded shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-vote-button bg-opacity-80 text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
@@ -253,6 +328,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
           </div>
           {/* <UnsupportedCurrencyFooter show={swapIsUnsupported} currentTrade={[currentTrade.INPUT, currentTrade.OUTPUT]} /> */}
         </div>
+        {query.from && query.to && currentTrade.from !== 0 && (
+          <TransactionDetail />
+        )}
       </div>
     </main>
   );

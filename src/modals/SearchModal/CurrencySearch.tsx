@@ -21,7 +21,11 @@ import ModalHeader from "components/Modal/Header";
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import { useRouter } from "next/router";
 import { Token } from "state/types";
-import { useAllTokens, useToken } from "state/swap/hooks";
+import {
+  useAllTokens,
+  useGetAvailableTokens,
+  useToken,
+} from "state/swap/hooks";
 import { ChainId } from "constants/chainIds";
 import useToggle from "hooks/useToggle";
 import {
@@ -42,6 +46,8 @@ interface CurrencySearchProps {
   currencyList?: string[];
   includeNativeCurrency?: boolean;
   allowManageTokenList?: boolean;
+  onChainChange?: (chain: string) => void;
+  onTokenChange?: (token: string) => void;
 }
 
 export function CurrencySearch({
@@ -57,10 +63,13 @@ export function CurrencySearch({
   currencyList,
   includeNativeCurrency = true,
   allowManageTokenList = true,
+  onChainChange,
+  onTokenChange,
 }: CurrencySearchProps) {
   const [selectedNetwork, setSelectedNetwork] = useState(1);
   const [networkTokens, setNetworkTokens] = useState([]);
   const { chainId } = useActiveWeb3React();
+  const getAvailableTokens = useGetAvailableTokens();
 
   // refs for fixed size lists
   const fixedList = useRef<FixedSizeList>();
@@ -86,8 +95,11 @@ export function CurrencySearch({
   const searchToken = useToken(debouncedQuery);
 
   const filteredTokens: Token[] = useMemo(() => {
-    return filterTokens(Object.values(networkTokens), debouncedQuery);
-  }, [networkTokens, debouncedQuery]);
+    return filterTokens(
+      Object.values(allTokens["tokens"] ?? allTokens),
+      debouncedQuery
+    );
+  }, [allTokens, debouncedQuery]);
   const sortedTokens: Token[] = useMemo(() => {
     return filteredTokens.sort(tokenComparator);
   }, [filteredTokens, tokenComparator]);
@@ -127,10 +139,11 @@ export function CurrencySearch({
 
   const handleCurrencySelect = useCallback(
     (currency: Token) => {
+      onTokenChange && onTokenChange(currency.symbol);
       onCurrencySelect(currency);
       onDismiss();
     },
-    [onDismiss, onCurrencySelect]
+    [onTokenChange, onCurrencySelect, onDismiss]
   );
 
   // clear the input on open
@@ -175,8 +188,10 @@ export function CurrencySearch({
   useOnClickOutside(node, open ? toggle : undefined);
 
   useEffect(() => {
-    setNetworkTokens(allTokens[selectedNetwork] || []);
-  }, [selectedNetwork]);
+    // setNetworkTokens(allTokens[selectedNetwork] || []);
+    getAvailableTokens(selectedNetwork);
+  }, [getAvailableTokens, selectedNetwork]);
+
   return (
     <div className="flex flex-col">
       <ModalHeader
@@ -202,12 +217,14 @@ export function CurrencySearch({
           </div>
         )}
 
-        <div className="flex h-full">
-          <div className="flex flex-wrap w-1/4 bg-dark-800 max-h-[inherit]">
+        <div className="flex gap-3 h-full">
+          <div className="flex flex-wrap w-[28%] bg-dark-300 max-h-[396px] overflow-y-auto rounded-2xl px-1">
             {AVAILABLE_NETWORKS.map((network: number) => (
               <div
+                key={network}
                 onClick={() => {
                   setSelectedNetwork(network);
+                  onChainChange(NETWORK_LABEL[network]);
                 }}
                 className="flex flex-col items-center justify-center w-1/2 p-2 cursor-pointer "
               >
@@ -236,7 +253,7 @@ export function CurrencySearch({
               />
             </div>
           ) : filteredSortedTokens?.length > 0 ? (
-            <div className="h-screen">
+            <div className="h-screen w-[72%]">
               <AutoSizer disableWidth>
                 {({ height }) => (
                   <CurrencyList

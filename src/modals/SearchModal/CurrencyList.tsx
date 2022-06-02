@@ -14,6 +14,7 @@ import useActiveWeb3React from "hooks/useActiveWeb3React";
 import Logo from "components/Logo";
 import { useTokenBalance } from "state/swap/hooks";
 import Loader from "components/Loader";
+import Image from "next/image";
 
 function currencyKey(currency: Token): string {
   return currency.isNative ? "ETHER" : currency.address;
@@ -103,7 +104,7 @@ function CurrencyRow({
 }) {
   const { account, chainId } = useActiveWeb3React();
   const key = currencyKey(currency);
-  const balance = useTokenBalance(currency);
+  // const balance = useTokenBalance(currency);
 
   // only show add or remove buttons if not on selected list
   return (
@@ -115,7 +116,7 @@ function CurrencyRow({
         display: "flex",
         justifyContent: "space-between",
       }}
-      className={`hover:bg-dark-800 rounded bg-red-500 flex`}
+      className={`hover:bg-dark-800 rounded bg-red-500 flex text-white cursor-pointer`}
       onClick={() => (isSelected ? null : onSelect())}
       // disabled={isSelected}
       // selected={otherSelected}
@@ -128,17 +129,26 @@ function CurrencyRow({
           <div title={currency.name} className="text-sm font-medium">
             {currency.symbol}
           </div>
-          <div className="text-sm font-thin">{currency.name}</div>
+          <div className="text-[10px] text-white">{currency.name}</div>
         </div>
       </div>
+      <div className="flex items-center justify-end">
+        <Image
+          src="/icons/star.svg"
+          alt=""
+          width={20}
+          height={20}
+          className="cursor-pointer"
+        />
+      </div>
       {/* <TokenTags currency={currency} /> */}
-      <div className="flex items-center justify-end bg-red-500">
+      {/* <div className="flex items-center justify-end bg-red-500">
         {balance ? (
           <Balance balance={parseFloat(balance)} />
         ) : account ? (
           <Loader />
         ) : null}
-      </div>
+      </div> */}
     </MenuItem>
   );
 }
