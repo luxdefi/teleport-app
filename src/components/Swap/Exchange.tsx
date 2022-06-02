@@ -149,7 +149,7 @@ export default function ExchangePanel({
             />
             {value && (
               <p className="mt-[5px] opacity-50 text-white text-xs">
-                1 ETH = 341.21549 Near
+                {/* 1 ETH = 341.21549 Near */}
               </p>
             )}
           </div>
