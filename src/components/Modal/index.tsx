@@ -64,6 +64,7 @@ export default function Modal({
           style: {
             backgroundColor: backgroundColor || "transparent",
             color: "#fff",
+            backdropFilter: "blur(50px)",
           },
         }}
       >
@@ -72,6 +73,7 @@ export default function Modal({
             padding: 0,
             backgroundColor: "rgb(19 18 36)",
             borderRadius: "1.5rem",
+            backdropFilter: "blur(50px)",
           }}
         >
           <div
@@ -93,7 +95,7 @@ export default function Modal({
               <div
                 className={`${
                   !isMax && !noPadding && "rounded-3xl p-6"
-                } flex flex-col w-full h-full  overflow-y-hidden bg-space-dark`}
+                } flex flex-col w-full h-full  overflow-y-hidden bg-primary`}
                 style={{ backgroundColor }}
               >
                 <div
