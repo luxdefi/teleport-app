@@ -149,7 +149,9 @@ export function CurrencySearch({
     (currency: Token) => {
       onTokenChange && onTokenChange(currency.symbol);
       onCurrencySelect(currency);
-      onDismiss();
+      setTimeout(() => {
+        onDismiss();
+      }, 100);
     },
     [onTokenChange, onCurrencySelect, onDismiss]
   );

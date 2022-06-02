@@ -29,6 +29,7 @@ import CustomizedSteppers from "components/Stepper";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { NETWORK_LABEL, SUPPORTED_NETWORKS } from "config/networks";
+import ListCard from "components/Swap/ListCard";
 
 interface SwapProps {}
 
@@ -50,15 +51,21 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const query = router.query;
   // console.log("app_query", query?.toChain, query?.fromChain);
 
-  const fromChain = (num: number) => {
-    router.query.fromChain = String(num);
-    router.push(router);
-  };
+  const fromChain = useCallback(
+    (num: number) => {
+      router.query.fromChain = String(num);
+      router.push(router);
+    },
+    [router]
+  );
 
-  const toChain = (num: number) => {
-    router.query.toChain = String(num);
-    router.push(router);
-  };
+  const toChain = useCallback(
+    (num: number) => {
+      router.query.toChain = String(num);
+      router.push(router);
+    },
+    [router]
+  );
 
   const to = (str: string) => {
     router.query.to = str.toUpperCase();
@@ -69,6 +76,15 @@ const Swap: React.FC<SwapProps> = ({}) => {
     router.query.from = str.toUpperCase();
     router.push(router);
   };
+
+  // useEffect(() => {
+  //   if (!query.fromChain) {
+  //     fromChain(ChainId.MAINNET);
+  //   }
+  //   if (!query.toChain) {
+  //     toChain(ChainId.MAINNET);
+  //   }
+  // }, [fromChain, query.fromChain, query.toChain, toChain]);
 
   const {
     currentAmount,
@@ -303,6 +319,46 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   },
                 ]}
               />
+            )}
+          {currentTrade.from &&
+            currentTrade.to &&
+            !!query?.fromChain &&
+            !!query?.toChain &&
+            query?.toChain === query?.fromChain && (
+              <div className="px-5">
+                <ListCard
+                  fee="$37.74"
+                  label="Via Sushiswap"
+                  amount="0.000000000491183"
+                  className="flex items-center justify-between"
+                />
+                <div className="flex flex-wrap gap-x-6">
+                  <ListCard
+                    fee="$37.74"
+                    label="Via Uniswap V2"
+                    amount="0.000000000491183"
+                    background="bg-white-2"
+                  />
+                  <ListCard
+                    fee="$37.74"
+                    label="Via 0x"
+                    amount="0.000000000491183"
+                    background="bg-white-2"
+                  />
+                  <ListCard
+                    fee="$37.74"
+                    label="Via 1inch"
+                    amount="0.000000000491183"
+                    background="bg-white-2"
+                  />
+                  <ListCard
+                    fee="$37.74"
+                    label="Via Uniswap V3"
+                    amount="0.000000000491183"
+                    background="bg-white-2"
+                  />
+                </div>
+              </div>
             )}
           <div className="mt-1 px-5">
             {!account ? (

@@ -60,15 +60,16 @@ export default function ExchangePanel({
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const handleDismissSearch = useCallback(() => {
-    setModalOpen(false);
+    setTimeout(() => {
+      setModalOpen(false);
+    }, 100);
   }, [setModalOpen]);
+
   const [fiat, setFiat] = useState(0);
   // const fiatValue =
   const getTokenFiatValue = useGetTokenFiatValue();
-  useEffect(() => {
-    initFetch();
-  }, [token]);
-  const initFetch = async () => {
+
+  const initFetch = useCallback(async () => {
     const val = await getTokenFiatValue(
       token?.isNative
         ? "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
@@ -76,8 +77,26 @@ export default function ExchangePanel({
     );
     console.log("valll getTokenFiatValue here", val);
     setFiat(val);
-  };
+  }, [getTokenFiatValue, token?.address, token?.isNative]);
   console.log("the_token", token);
+  useEffect(() => {
+    initFetch();
+  }, [initFetch, token]);
+  const onKeyDown = function (e) {
+    var key = e.keyCode ?? e.which;
+
+    if (
+      !(
+        [8, 9, 13, 27, 46, 110, 190].indexOf(key) !== -1 ||
+        (key == 65 && (e.ctrlKey || e.metaKey)) ||
+        (key >= 35 && key <= 40) ||
+        (key >= 48 && key <= 57 && !(e.shiftKey || e.altKey)) ||
+        (key >= 96 && key <= 105)
+      )
+    )
+      e.preventDefault();
+  };
+
   return (
     <div
       id={id}
@@ -141,16 +160,20 @@ export default function ExchangePanel({
               placeholder="Enter an amount"
               className="border-none outline-none focus:outline-none bg-transparent text-right placeholder:text-[#626471] text-xl placeholder:text-xl text-white appearance-none overflow-ellipsis placeholder-low-emphesis"
               inputMode="decimal"
-              onKeyDown={() => onKeyDownFunc()}
+              onKeyDown={(e) => {
+                onKeyDown(e);
+                onKeyDownFunc();
+              }}
               onChange={(e) => onUserInput(e.target.value)}
               value={value}
               type="number"
               minLength={1}
               debounceTimeout={2000}
             />
+
             {value && (
               <p className="mt-[5px] opacity-50 text-white text-xs">
-                {/* 1 ETH = 341.21549 Near */}
+                1 ETH = 341.21549 Near
               </p>
             )}
           </div>
@@ -183,7 +206,7 @@ export default function ExchangePanel({
           </div>
         )} */}
       </div>
-      {!disableCurrencySelect && onCurrencySelect && (
+      {!disableCurrencySelect && onCurrencySelect && modalOpen && (
         <CurrencySearchModal
           isOpen={modalOpen}
           onDismiss={handleDismissSearch}
@@ -195,59 +218,6 @@ export default function ExchangePanel({
           onTokenChange={onTokenChange}
         />
       )}
-
-      {/* <div>
-        {" "}
-        <ListCard
-          fee="$37.74"
-          label="Via Sushiswap"
-          amount="0.000000000491183"
-          className="flex items-center justify-between"
-        />
-        <div className="flex flex-wrap gap-x-6">
-          <ListCard
-            fee="$37.74"
-            label="Via Uniswap V2"
-            amount="0.000000000491183"
-          />
-          <ListCard fee="$37.74" label="Via 0x" amount="0.000000000491183" />
-          <ListCard fee="$37.74" label="Via 1inch" amount="0.000000000491183" />
-          <ListCard
-            fee="$37.74"
-            label="Via Uniswap V3"
-            amount="0.000000000491183"
-          />
-        </div>
-      </div> */}
     </div>
   );
 }
-
-interface ListCardProps {
-  label?: string;
-  fee?: string;
-  amount?: string;
-  className?: string;
-}
-
-const ListCard = ({ label, fee, amount, className }: ListCardProps) => {
-  return (
-    <div
-      className={`flex-1 px-4 py-5 bg-accent mt-8 rounded-xl relative ${
-        className && className
-      }`}
-    >
-      <h1 className="text-xl text-white">{amount}</h1>
-      <div className="flex items-center gap-x-3">
-        <h1 className="text-sm text-white">Est. gas fee ={fee}</h1>
-        <button className="outline-none flex items-center">
-          <Image src="/icons/info.svg" alt="" width={20} height={20} />
-        </button>
-      </div>
-
-      <div className="px-2 py-1 absolute -top-3 left-5 bg-black">
-        <h1 className="text-sm text-white">{label}</h1>
-      </div>
-    </div>
-  );
-};
