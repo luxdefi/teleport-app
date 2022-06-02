@@ -11,6 +11,7 @@ import {
   updateCurrentAmount,
   fetchBalances,
   updateCurrentBalances,
+  updateActiveChain,
 } from "./action";
 
 interface SwapState {
@@ -25,6 +26,7 @@ interface SwapState {
   currentAmount: TokenSelect;
   balances: Balance[];
   currentBalances: TokenSelect;
+  activeChain: ChainId;
 }
 const initialState: SwapState = {
   loading: false,
@@ -60,6 +62,7 @@ const initialState: SwapState = {
     to: 0,
     from: 0,
   },
+  activeChain: ChainId.MAINNET,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -87,5 +90,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(updateCurrentBalances, (state, action) => {
       state.currentBalances = action.payload;
+    })
+    .addCase(updateActiveChain, (state, action) => {
+      state.activeChain = action.payload;
     })
 );

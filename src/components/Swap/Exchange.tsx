@@ -12,6 +12,7 @@ import Logo from "components/Logo";
 import { ChevronDownIcon } from "@heroicons/react/outline";
 import { useGetTokenFiatValue } from "state/swap/hooks";
 import CurrencySearchModal from "modals/SearchModal/CurrencySearchModal";
+import Image from "next/image";
 
 interface ExchangePanelProps {
   value?: string;
@@ -149,7 +150,7 @@ export default function ExchangePanel({
             />
             {value && (
               <p className="mt-[5px] opacity-50 text-white text-xs">
-                1 ETH = 341.21549 Near
+                {/* 1 ETH = 341.21549 Near */}
               </p>
             )}
           </div>
@@ -194,6 +195,59 @@ export default function ExchangePanel({
           onTokenChange={onTokenChange}
         />
       )}
+
+      {/* <div>
+        {" "}
+        <ListCard
+          fee="$37.74"
+          label="Via Sushiswap"
+          amount="0.000000000491183"
+          className="flex items-center justify-between"
+        />
+        <div className="flex flex-wrap gap-x-6">
+          <ListCard
+            fee="$37.74"
+            label="Via Uniswap V2"
+            amount="0.000000000491183"
+          />
+          <ListCard fee="$37.74" label="Via 0x" amount="0.000000000491183" />
+          <ListCard fee="$37.74" label="Via 1inch" amount="0.000000000491183" />
+          <ListCard
+            fee="$37.74"
+            label="Via Uniswap V3"
+            amount="0.000000000491183"
+          />
+        </div>
+      </div> */}
     </div>
   );
 }
+
+interface ListCardProps {
+  label?: string;
+  fee?: string;
+  amount?: string;
+  className?: string;
+}
+
+const ListCard = ({ label, fee, amount, className }: ListCardProps) => {
+  return (
+    <div
+      className={`flex-1 px-4 py-5 bg-accent mt-8 rounded-xl relative ${
+        className && className
+      }`}
+    >
+      <h1 className="text-xl text-white">{amount}</h1>
+      <div className="flex items-center gap-x-3">
+        <h1 className="text-sm text-white">Est. gas fee ={fee}</h1>
+        <button className="outline-none flex items-center">
+          <Image src="/icons/info.svg" alt="" width={20} height={20} />
+        </button>
+      </div>
+
+      <div className="px-2 py-1 absolute -top-3 left-5 bg-black">
+        <h1 className="text-sm text-white">{label}</h1>
+      </div>
+    </div>
+  );
+};
