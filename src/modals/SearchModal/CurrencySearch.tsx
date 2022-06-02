@@ -231,7 +231,7 @@ export function CurrencySearch({
         )}
 
         <div className="flex gap-3 h-full">
-          <div className="flex flex-wrap w-[28%] bg-dark-300 max-h-[396px] overflow-y-auto rounded-2xl px-1">
+          <div className="flex flex-wrap w-[28%] bg-dark-300 max-h-[400px] overflow-y-auto rounded-2xl px-1">
             {AVAILABLE_NETWORKS.map((network: number) => (
               <div
                 key={network}
@@ -266,7 +266,7 @@ export function CurrencySearch({
               />
             </div>
           ) : filteredSortedTokens?.length > 0 ? (
-            <div className="h-screen w-[72%]">
+            <div className="h-[400px] overflow-y-auto w-[72%]">
               <AutoSizer disableWidth>
                 {({ height }) => (
                   <CurrencyList
