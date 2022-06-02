@@ -1,4 +1,4 @@
-import { ArrowBackIos, Close } from "@mui/icons-material";
+import { ArrowBackIos, CloseRounded } from "@mui/icons-material";
 import React, { FC } from "react";
 interface ModalHeaderProps {
   title?: string;
@@ -40,10 +40,10 @@ const ModalHeader: FC<ModalHeaderProps> = ({
         <XCircle width={24} height={24} />
       </div> */}
       <div
-        className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-full cursor-pointer primary bg-white"
+        className="flex items-center justify-center w-10 h-10 text-white cursor-pointer primary"
         onClick={onClose}
       >
-        <Close />
+        <CloseRounded />
       </div>
     </div>
   );

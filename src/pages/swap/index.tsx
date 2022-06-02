@@ -143,18 +143,18 @@ const Swap: React.FC<SwapProps> = ({}) => {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center flex-grow w-full h-screen">
+    <main className="flex flex-col items-center justify-center flex-grow w-full h-full mt-24">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
-        <head>
+        <Head>
           <title>LUX | BRIDGE</title>
           <meta
             key="description"
             name="description"
             content="LUX BRIDGE Multi-chain swap"
           />
-        </head>
+        </Head>
 
-        <div className="p-4 space-y-4 rounded-3xl bg-space-grey z-1">
+        <div className="py-6 space-y-4 rounded-3xl bg-primary z-1 mb-7">
           {/* Add slippage */}
           <div className="px-5">
             <SwapHeader
@@ -226,20 +226,26 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     onSwitchTokens();
                   }}
                 >
-                  <div className="p-1 rounded-full bg-dark-900">
+                  <div className="p-1 rounded-full bg-secondary">
                     <div
-                      className="p-3 rounded-full bg-dark-800 hover:bg-dark-700"
+                      className="py-1 rounded-full flex flex-col justify-center"
                       onMouseEnter={() => setAnimateSwapArrows(true)}
                       onMouseLeave={() => setAnimateSwapArrows(false)}
                     >
-                      Arrow
+                      <Image
+                        src="/icons/swithcer.svg"
+                        alt=""
+                        width={30}
+                        height={30}
+                        className="stroke-white"
+                      />
                     </div>
                   </div>
                 </button>
               </div>
             </div>
 
-            <div>
+            <div className="px-5">
               <Exchange
                 // priceImpact={priceImpact}
                 label={`Swap To:`}
@@ -300,14 +306,14 @@ const Swap: React.FC<SwapProps> = ({}) => {
           <div className="mt-1 px-5">
             {!account ? (
               <div
-                className="w-full px-6 py-4 text-base text-center border rounded shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-vote-button bg-opacity-80 text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={toggleWalletModal}
               >
                 Connect Wallet
               </div>
             ) : (
               <button
-                className="w-full px-6 py-4 text-base text-center border rounded shadow-sm focus:ring- focus:ring-offset- bg-vote-button bg-opacity-80 text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={() => {
                   swapTokens();
                 }}

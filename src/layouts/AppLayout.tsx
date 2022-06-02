@@ -13,7 +13,7 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { chainId } = useActiveWeb3React();
   return (
-    <div className="z-0 flex flex-col items-center w-full h-screen pb-16 lg:pb-0">
+    <div className="z-0 flex flex-col items-center w-full min-h-screen pb-16 lg:pb-0">
       <Header />
       <main
         className="flex flex-col items-center justify-start flex-grow w-full h-full bg-black"

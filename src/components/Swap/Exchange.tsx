@@ -69,25 +69,28 @@ export default function ExchangePanel({
   }, [token]);
   const initFetch = async () => {
     const val = await getTokenFiatValue(
-      token.isNative
+      token?.isNative
         ? "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-        : token.address
+        : token?.address
     );
     console.log("valll getTokenFiatValue here", val);
     setFiat(val);
   };
+  console.log("the_token", token);
   return (
     <div
       id={id}
-      className={`${hideInput ? "p-4" : "p-5"} rounded bg-space-dark`}
+      className={`${hideInput ? "py-4" : "py-5"} rounded bg-space-dark`}
     >
       <div className="flex flex-col justify-between space-y-3">
-        <div className={"w-full"}>
+        <div className={"w-full flex items-center justify-between"}>
           <button
             type="button"
             className={`${
               !!token ? "text-primary" : "text-high-emphesis"
-            } open-currency-select-button h-full outline-none select-none cursor-pointer border-none text-xl font-medium items-center`}
+            } open-currency-select-button h-full outline-none select-none cursor-pointer border border-white-10 text-xl font-medium items-center rounded-full ${
+              token ? "bg-white-2" : "bg-primary-300"
+            } `}
             onClick={() => {
               if (onCurrencySelect) {
                 console.log("opening modal", modalOpen);
@@ -95,8 +98,8 @@ export default function ExchangePanel({
               }
             }}
           >
-            <div className="flex items-center gap-1.5 rounded-full bg-space-grey p-2 pr-3.5">
-              {token ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-space-grey p-2 pl-3.5">
+              {token && (
                 <div className="flex items-center">
                   <Logo
                     src={token?.logoURI}
@@ -106,21 +109,12 @@ export default function ExchangePanel({
                     className="rounded"
                   />
                 </div>
-              ) : (
-                <div
-                  className="rounded bg-dark-700"
-                  style={{ maxWidth: 54, maxHeight: 54 }}
-                >
-                  <div style={{ width: 54, height: 54 }}>
-                    <Lottie animationData={selectCoinAnimation} autoplay loop />
-                  </div>
-                </div>
               )}
-              <div className="text-lg font-semibold token-symbol-container md:text-xl">
+              <div className="text-lg font-semibold token-symbol-container md:text-xl text-white">
                 {token && token.symbol ? (
                   token.symbol
                 ) : (
-                  <div className="px-2 py-1 mt-1 text-xs font-medium bg-transparent border rounded-full hover:bg-primary border-low-emphesis text-secondary whitespace-nowrap ">
+                  <div className="px-2 py-1 mt-1 text-xs font-medium bg-primary-300 text-white border-low-emphesis whitespace-nowrap ">
                     Select a token
                   </div>
                 )}
@@ -129,58 +123,10 @@ export default function ExchangePanel({
                 <ChevronDownIcon
                   width={16}
                   height={16}
-                  className="stroke-current"
+                  className="stroke-primary-300"
                 />
               )}
             </div>
-            {/* <div className="flex">
-              {token ? (
-                <div className="flex items-center">
-                  <Logo
-                    src={token?.logoURI}
-                    width={"24px"}
-                    height={"24px"}
-                    alt={token?.symbol}
-                    className="rounded"
-                  />
-                </div>
-              ) : (
-                <div
-                  className="rounded bg-dark-700"
-                  style={{ maxWidth: 54, maxHeight: 54 }}
-                >
-                  <div style={{ width: 54, height: 54 }}>
-                    <Lottie animationData={selectCoinAnimation} autoplay loop />
-                  </div>
-                </div>
-              )}
-              <div className="flex flex-1 flex-col items-start justify-center mx-3.5">
-                {label && (
-                  <div className="text-xs font-medium text-secondary whitespace-nowrap">
-                    {label}
-                  </div>
-                )}
-                <div className="flex items-center">
-                  <div className="text-lg font-bold token-symbol-container md:text-2xl">
-                    {token && token.symbol ? (
-                      token.symbol
-                    ) : (
-                      <div className="px-2 py-1 mt-1 text-xs font-medium bg-transparent border rounded-full hover:bg-primary border-low-emphesis text-secondary whitespace-nowrap ">
-                        Select a token
-                      </div>
-                    )}
-                  </div>
-
-                  {!disableCurrencySelect && token && (
-                    <ChevronDownIcon
-                      width={16}
-                      height={16}
-                      className="ml-2 stroke-current"
-                    />
-                  )}
-                </div>
-              </div>
-            </div> */}
           </button>
           <div className="text-right">
             <DebounceInput
@@ -208,7 +154,7 @@ export default function ExchangePanel({
             )}
           </div>
         </div>
-        {!hideInput && (
+        {/* {!hideInput && (
           <div className="flex items-center w-full p-3 space-x-3 rounded bg-transaparent text-space-light-gray focus:bg-dark-700">
             <>
               {showMaxButton && selectedCurrencyBalance && (
@@ -219,24 +165,6 @@ export default function ExchangePanel({
                   Max
                 </button>
               )}
-              <DebounceInput
-                style={{
-                  WebkitAppearance: "none",
-                  margin: 0,
-                  MozAppearance: "textfield",
-                }}
-                pattern="^[0-9]*[.,]?[0-9]*$"
-                title="Token Amount"
-                placeholder="0.0"
-                className="relative flex-auto w-0 p-0 overflow-hidden text-2xl font-bold bg-transparent border-none outline-none appearance-none overflow-ellipsis placeholder-low-emphesis focus:placeholder-primary"
-                inputMode="decimal"
-                onKeyDown={() => onKeyDownFunc()}
-                onChange={(e) => onUserInput(e.target.value)}
-                value={value}
-                type="number"
-                minLength={1}
-                debounceTimeout={2000}
-              />
               {!hideBalance && token && selectedCurrencyBalance ? (
                 <div className="flex flex-col">
                   <div
@@ -252,7 +180,7 @@ export default function ExchangePanel({
               ) : null}
             </>
           </div>
-        )}
+        )} */}
       </div>
       {!disableCurrencySelect && onCurrencySelect && (
         <CurrencySearchModal

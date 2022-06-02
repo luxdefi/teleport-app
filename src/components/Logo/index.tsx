@@ -24,7 +24,16 @@ const Logo: FC<LogoProps> = ({
   ...rest
 }) => {
   return (
-    <div className="rounded" style={{ width, height }}>
+    <div
+      className="rounded"
+      style={{
+        width,
+        height,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <img
         src={src || "/images/unknown.webp"}
         // onError={() => {
