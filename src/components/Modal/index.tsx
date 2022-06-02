@@ -57,7 +57,9 @@ export default function Modal({
         keepMounted
         onClose={onDismiss}
         aria-describedby="alert-dialog-slide-description"
-        style={{}}
+        style={{
+          backdropFilter: "blur(10px)",
+        }}
         PaperProps={{
           style: {
             backgroundColor: backgroundColor || "transparent",

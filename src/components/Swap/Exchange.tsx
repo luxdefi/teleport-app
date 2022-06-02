@@ -32,6 +32,8 @@ interface ExchangePanelProps {
   selectedCurrencyBalance: string;
   fiatValue?: number | null;
   onKeyDownFunc: () => void;
+  onChainChange?: (chain: string) => void;
+  onTokenChange?: (token: string) => void;
 }
 
 export default function ExchangePanel({
@@ -52,6 +54,8 @@ export default function ExchangePanel({
   fiatValue,
   otherToken,
   onKeyDownFunc,
+  onChainChange,
+  onTokenChange,
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const handleDismissSearch = useCallback(() => {
@@ -178,6 +182,31 @@ export default function ExchangePanel({
               </div>
             </div> */}
           </button>
+          <div className="text-right">
+            <DebounceInput
+              style={{
+                WebkitAppearance: "none",
+                margin: 0,
+                MozAppearance: "textfield",
+              }}
+              pattern="^[0-9]*[.,]?[0-9]*$"
+              title="Token Amount"
+              placeholder="Enter an amount"
+              className="border-none outline-none focus:outline-none bg-transparent text-right placeholder:text-[#626471] text-xl placeholder:text-xl text-white appearance-none overflow-ellipsis placeholder-low-emphesis"
+              inputMode="decimal"
+              onKeyDown={() => onKeyDownFunc()}
+              onChange={(e) => onUserInput(e.target.value)}
+              value={value}
+              type="number"
+              minLength={1}
+              debounceTimeout={2000}
+            />
+            {value && (
+              <p className="mt-[5px] opacity-50 text-white text-xs">
+                1 ETH = 341.21549 Near
+              </p>
+            )}
+          </div>
         </div>
         {!hideInput && (
           <div className="flex items-center w-full p-3 space-x-3 rounded bg-transaparent text-space-light-gray focus:bg-dark-700">
@@ -233,6 +262,8 @@ export default function ExchangePanel({
           selectedCurrency={token}
           otherSelectedCurrency={otherToken}
           showCommonBases={true}
+          onChainChange={onChainChange}
+          onTokenChange={onTokenChange}
         />
       )}
     </div>

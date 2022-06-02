@@ -5,6 +5,8 @@ import Modal from "components/Modal";
 import { Token, TokenList } from "state/types";
 import useLast from "hooks/useLast";
 import usePrevious from "hooks/usePrevious";
+import { TokenListProvider, TokenInfo } from "@solana/spl-token-registry";
+import { ChainId } from "constants/chainIds";
 
 interface CurrencySearchModalProps {
   isOpen: boolean;
@@ -16,6 +18,8 @@ interface CurrencySearchModalProps {
   currencyList?: string[];
   includeNativeCurrency?: boolean;
   allowManageTokenList?: boolean;
+  onChainChange?: (chain: string) => void;
+  onTokenChange?: (token: string) => void;
 }
 
 function CurrencySearchModal({
@@ -28,11 +32,31 @@ function CurrencySearchModal({
   showCommonBases = false,
   includeNativeCurrency = true,
   allowManageTokenList = true,
+  onChainChange,
+  onTokenChange,
 }: CurrencySearchModalProps) {
+  const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [modalView, setModalView] = useState<CurrencyModalView>(
     CurrencyModalView.manage
   );
   const lastOpen = useLast(isOpen);
+
+  // useEffect(() => {
+  //   new TokenListProvider().resolve().then((tokens) => {
+  //     const tokenList = tokens.filterByChainId(ChainId.MAINNET).getList();
+  //     console.log("tokens.render", tokens);
+  //     console.log("tokenList.render", tokenList);
+
+  //     setTokenMap(
+  //       tokenList.reduce((map, item) => {
+  //         map.set(item.address, item);
+  //         return map;
+  //       }, new Map())
+  //     );
+  //   });
+  // }, [setTokenMap]);
+
+  // console.log("tokenMap.render", tokenMap);
 
   useEffect(() => {
     if (isOpen && !lastOpen) {
@@ -92,6 +116,8 @@ function CurrencySearchModal({
           currencyList={currencyList}
           includeNativeCurrency={includeNativeCurrency}
           allowManageTokenList={allowManageTokenList}
+          onChainChange={onChainChange}
+          onTokenChange={onTokenChange}
         />
       ) : (
         ""

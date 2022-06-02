@@ -1,5 +1,5 @@
 import { SUPPORTED_NETWORKS } from "config/networks";
-import { ChainId } from "constants/chainIds";
+import { ChainId, NATIVE } from "constants/chainIds";
 import { addresses } from "constants/contract";
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import { useCallback } from "react";
@@ -22,9 +22,11 @@ import { notify } from "components/alertMessage";
 export function useAllTokens(): { [chainId in ChainId]?: Token[] } {
   return useSelector((state: AppState) => state.swap.tokens);
 }
-export function useGetAvailableTokens(): () => void {
+export function useGetAvailableTokens(): (chain?: number) => void {
   const { chainId } = useActiveWeb3React();
-  const activeChain: number = useSelector((state: AppState) => state.swap.activeChain);
+  const activeChain: number = useSelector(
+    (state: AppState) => state.swap.activeChain
+  );
   const chainAddresses: { LUX: string } =
     (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
   const dispatch = useDispatch();
@@ -64,6 +66,43 @@ export function useGetAvailableTokens(): () => void {
       console.log("error in useGetAvailableTokens", error);
     }
   }, [dispatch, chainId]);
+  // const supported_networks = SUPPORTED_NETWORKS;
+  // const native = NATIVE;
+  // console.log("chainId ==>", native, supported_networks);
+
+  // return useCallback(
+  //   async (chain) => {
+  //     console.log("chainId ==>", native, supported_networks[chainId]);
+  //     try {
+  //       console.log("starting fetch ==>", chain);
+  //       // const resultTokens: { [chainId in ChainId]?: Token[] } = {};
+
+  //       const resultTokens: { [chainId in ChainId]?: Token[] } =
+  //         await Moralis.Plugins.oneInch.getSupportedTokens({
+  //           chain:
+  //             SUPPORTED_NETWORKS[chainId].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+  //           limit: 10, // The number of tokens you want to get
+  //           // native[chain ?? chainId].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+  //         });
+
+  //       console.log("_resultTokens", resultTokens);
+  //       dispatch(fetchTokens(resultTokens));
+
+  //       const from = Object.values(resultTokens[1]).find(
+  //         (val: any) => val.symbol === "ETH"
+  //       );
+  //       dispatch(
+  //         updateCurrentTrade({
+  //           to: {},
+  //           from: { ...from, isNative: from.symbol === "ETH" },
+  //         })
+  //       );
+  //     } catch (error) {
+  //       console.log("error in useGetAvailableTokens", error);
+  //     }
+  //   },
+  //   [native, supported_networks, chainId, Moralis.Plugins.oneInch, dispatch]
+  // );
 }
 
 export function useFetchUserBalances(): () => void {
@@ -192,7 +231,7 @@ export function useGetQuote(): (
           (quote.toTokenAmount / 10 ** quote.toToken.decimals).toFixed(8)
         );
       } catch (error) {
-        console.log('error useGetQuote,', error)
+        console.log("error useGetQuote,", error);
         // console.log(
         //   "errror in useGetQuote quote",
         //   JSON.parse(error.message.text)

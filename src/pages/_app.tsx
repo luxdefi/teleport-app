@@ -11,9 +11,9 @@ import { PersistGate } from "redux-persist/integration/react";
 import AppLayout from "layouts/AppLayout";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { MoralisProvider } from "react-moralis";
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import { ChainId } from "constants/chainIds";
-import { MoralisProvider } from "react-moralis";
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
