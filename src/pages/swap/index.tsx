@@ -168,8 +168,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 !!query?.fromChain &&
                 !!query?.toChain
               }
-              fromChain={query?.fromChain as string}
-              toChain={query?.toChain as string}
+              fromChain={NETWORK_LABEL[Number(query?.fromChain)]}
+              toChain={NETWORK_LABEL[Number(query?.toChain)]}
             />
           </div>
           {/* <ConfirmSwapModal

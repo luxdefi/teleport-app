@@ -18,7 +18,7 @@ interface CurrencySearchModalProps {
   currencyList?: string[];
   includeNativeCurrency?: boolean;
   allowManageTokenList?: boolean;
-  onChainChange?: (chain: string) => void;
+  onChainChange?: (chain: number) => void;
   onTokenChange?: (token: string) => void;
 }
 
