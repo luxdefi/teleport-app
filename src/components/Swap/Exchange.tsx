@@ -33,7 +33,7 @@ interface ExchangePanelProps {
   selectedCurrencyBalance: string;
   fiatValue?: number | null;
   onKeyDownFunc: () => void;
-  onChainChange?: (chain: string) => void;
+  onChainChange?: (chain: number) => void;
   onTokenChange?: (token: string) => void;
 }
 

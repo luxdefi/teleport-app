@@ -22,6 +22,7 @@ import { CHAINS, getAddChainParameters, URLS } from "config/chains";
 import useActiveWeb3React from "hooks/useActiveWeb3React";
 import { metaMask } from "connectors/metaMask";
 export function getOptions() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { chainId, isActivating } = useActiveWeb3React();
   const chain = 1 || chainId;
   const isMetamask = window.ethereum && window.ethereum.isMetaMask;

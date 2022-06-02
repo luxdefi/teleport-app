@@ -49,7 +49,7 @@ interface CurrencySearchProps {
   currencyList?: string[];
   includeNativeCurrency?: boolean;
   allowManageTokenList?: boolean;
-  onChainChange?: (chain: string) => void;
+  onChainChange?: (chain: number) => void;
   onTokenChange?: (token: string) => void;
 }
 
@@ -100,6 +100,7 @@ export function CurrencySearch({
   const searchToken = useToken(debouncedQuery);
 
   const filteredTokens: Token[] = useMemo(() => {
+    if (Object.values(allTokens)[0] === undefined) return [];
     return filterTokens(
       Object.values(Object.values(allTokens)[0]),
       debouncedQuery
@@ -236,7 +237,7 @@ export function CurrencySearch({
                 key={network}
                 onClick={() => {
                   setSelectedNetwork(network);
-                  onChainChange(NETWORK_LABEL[network]);
+                  onChainChange(network);
                 }}
                 className="flex flex-col items-center justify-center w-1/2 py-1.5 px-3 cursor-pointer "
               >

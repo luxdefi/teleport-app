@@ -34,7 +34,7 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   const dispatch = useDispatch();
   const { Moralis } = useMoralis();
 
-  console.log("activeChainToFetch", activeChain, aChain);
+  // console.log("activeChainToFetch", activeChain, aChain);
   return useCallback(async () => {
     try {
       const result: { tokens: Token[] } =
@@ -46,7 +46,7 @@ export function useGetAvailableTokens(): (chain?: number) => void {
         decimals: 18,
         symbol: "LUX",
         address: chainAddresses.LUX,
-        logoURI: window.location.origin + "/favicon.ico",
+        logoURI: window.location.origin + "/lux_logo.svg",
         name: "LUX",
       };
       const resultTokens = result.tokens;
@@ -59,12 +59,12 @@ export function useGetAvailableTokens(): (chain?: number) => void {
       const to = Object.values(resultTokens).find(
         (val: any) => val.symbol === "LUX"
       );
-      dispatch(
-        updateCurrentTrade({
-          to: { ...to, isNative: to.symbol === "ETH" },
-          from: { ...from, isNative: from.symbol === "ETH" },
-        })
-      );
+      // dispatch(
+      //   updateCurrentTrade({
+      //     to: { ...to, isNative: to.symbol === "ETH" },
+      //     from: { ...from, isNative: from.symbol === "ETH" },
+      //   })
+      // );
     } catch (error) {
       console.log("error in useGetAvailableTokens", error);
     }

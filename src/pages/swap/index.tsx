@@ -28,12 +28,12 @@ import TransactionDetail from "components/Swap/TransactionDetail";
 import CustomizedSteppers from "components/Stepper";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
-import { NETWORK_LABEL } from "config/networks";
+import { NETWORK_LABEL, SUPPORTED_NETWORKS } from "config/networks";
 
 interface SwapProps {}
 
 const Swap: React.FC<SwapProps> = ({}) => {
-  const { chainId, account } = useActiveWeb3React();
+  const { library, connector, chainId, account } = useActiveWeb3React();
   const { loading } = useSelector((state: any) => state.swap);
   const { Moralis, initialize } = useMoralis();
 
@@ -50,13 +50,13 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const query = router.query;
   // console.log("app_query", query?.toChain, query?.fromChain);
 
-  const fromChain = (str: string) => {
-    router.query.fromChain = str.toUpperCase();
+  const fromChain = (num: number) => {
+    router.query.fromChain = String(num);
     router.push(router);
   };
 
-  const toChain = (str: string) => {
-    router.query.toChain = str.toUpperCase();
+  const toChain = (num: number) => {
+    router.query.toChain = String(num);
     router.push(router);
   };
 
@@ -315,8 +315,39 @@ const Swap: React.FC<SwapProps> = ({}) => {
             ) : (
               <button
                 className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
-                onClick={() => {
-                  swapTokens();
+                onClick={async () => {
+                  if (chainId !== Number(query?.fromChain)) {
+                    // connector.activate(Number(query?.fromChain));
+                    console.debug(
+                      `Switching to chain ${Number(query?.fromChain)}`,
+                      SUPPORTED_NETWORKS[Number(query?.fromChain)]
+                    );
+                    const params = SUPPORTED_NETWORKS[Number(query?.fromChain)];
+                    try {
+                      await library?.send("wallet_switchEthereumChain", [
+                        {
+                          chainId: `0x${Number(query?.fromChain).toString(16)}`,
+                        },
+                        account,
+                      ]);
+                    } catch (switchError) {
+                      // This error code indicates that the chain has not been added to MetaMask.
+                      // @ts-ignore TYPE NEEDS FIXING
+                      if (switchError.code === 4902) {
+                        try {
+                          await library?.send("wallet_addEthereumChain", [
+                            params,
+                            account,
+                          ]);
+                        } catch (addError) {
+                          // handle "add" error
+                          console.error(`Add chain error ${addError}`);
+                        }
+                      }
+                      console.error(`Switch chain error ${switchError}`);
+                      // handle other "switch" errors
+                    }
+                  } else swapTokens();
                 }}
                 id="swap-button"
                 disabled={
@@ -325,8 +356,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 {loading ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : chainId !== chainId ? (
-                  `switch to ${NETWORK_LABEL[chainId]} network`
+                ) : chainId !== Number(query?.fromChain) ? (
+                  `switch to ${NETWORK_LABEL[Number(query?.fromChain)]} network`
                 ) : error ? (
                   error.description
                 ) : (
