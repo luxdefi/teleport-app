@@ -68,6 +68,7 @@ module.exports = {
         secondary: "#26293B",
         "high-emphesis": "#E3E3E3",
         "vote-button": "rgb(74, 169, 86)",
+        accent: "#4F46E5",
       },
       lineHeight: {
         "48px": "48px",
