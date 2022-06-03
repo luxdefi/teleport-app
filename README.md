@@ -1,4 +1,3 @@
 # BRIDGE
 
-replicating
-https://app.rubic.exchange UI
+Lux Bridge react UI.
