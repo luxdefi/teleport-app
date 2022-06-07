@@ -1,6 +1,6 @@
 import React from "react";
 
-const MenuIcon = (props:any) => {
+const MenuIcon = (props: any) => {
   return (
     <svg
       width={24}
@@ -11,7 +11,7 @@ const MenuIcon = (props:any) => {
     >
       <path
         d="M3 12h18M3 6h18M3 18h18"
-        stroke="#fff"
+        stroke="#4F46E5"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"

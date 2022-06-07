@@ -241,7 +241,7 @@ export default function WalletModal({ ENSName }: { ENSName?: string }) {
           )}
           {walletView !== WALLET_VIEWS.PENDING && (
             <Link href="https://ethereum.org/wallets/" passHref>
-              <p className="text-left underline cursor-pointer text-seablue">
+              <p className="text-left underline cursor-pointer text-white">
                 New to Ethereum? Learn more about wallets
               </p>
             </Link>

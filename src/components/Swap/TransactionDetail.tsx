@@ -3,6 +3,29 @@ import React, { useState } from "react";
 
 const TransactionDetail = () => {
   const [show, setShow] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const copyTextToClipboard = async (text) => {
+    if ("clipboard" in navigator) {
+      return await navigator.clipboard.writeText(text);
+    } else {
+      return document.execCommand("copy", true, text);
+    }
+  };
+
+  const handleCopyClick = (copyText) => {
+    copyTextToClipboard(copyText)
+      .then(() => {
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 2000);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className={`w-full rounded-3xl ${show && "bg-primary"} text-white`}>
       <div
@@ -51,9 +74,19 @@ const TransactionDetail = () => {
           <div className="flex flex-col p-5 cursor-pointer">
             <div className="flex items-center justify-between">
               <p>You will receive Polygon tokens at this address</p>
-              <div className="flex items-center cursor-pointer">
+              <div className="flex items-center cursor-pointer relative">
+                {isCopied && (
+                  <h1 className="text-sm text-green font-medium absolute -top-7">
+                    Copied!
+                  </h1>
+                )}
                 <p className="mr-8">0x997...e41a4</p>
-                <Image src="/icons/copy.svg" alt="" width={16} height={16} />
+                <button
+                  onClick={() => handleCopyClick("0x997...e41a4")}
+                  className="outline-none flex justify-center items-center"
+                >
+                  <Image src="/icons/copy.svg" alt="" width={16} height={16} />
+                </button>
               </div>
             </div>
           </div>
