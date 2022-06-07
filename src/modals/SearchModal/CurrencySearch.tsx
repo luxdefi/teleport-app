@@ -210,7 +210,7 @@ export function CurrencySearch({
         className="px-6 py-5 bg-space-grey"
         onClose={onDismiss}
       />
-      <div className="flex h-full flex-col pl-6 pr-6 w-full min-w-[82vw] md:min-w-[400px] ">
+      <div className="flex h-full flex-col pl-6 pr-6 w-full min-w-[82vw] md:min-w-[400px]">
         {!currencyList && (
           <div className="mt-0 mb-3 sm:mt-3 sm:mb-8">
             <div className="relative">
