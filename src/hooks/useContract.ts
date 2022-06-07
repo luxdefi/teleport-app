@@ -1,7 +1,7 @@
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { getContract } from "../functions/contract";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useActiveWeb3React } from "./useActiveWeb3React";
 import { isAddress } from "functions/validate";
 import { abis, addresses } from "constants/contract";
@@ -51,4 +51,19 @@ export function useContract(
 
 export function useLuxContract(): Contract | null {
   return useContract("LUX");
+}
+export function useTeleportLuxContract(): Contract | null {
+  return useContract("TELEPORT_LUX");
+}
+export function useTeleportEthContract(): Contract | null {
+  return useContract("TELEPORT_ETH");
+}
+export function useLbtcContract(): (address) => Contract | null {
+  return useCallback(
+    (address) => {
+      return useContract(address)
+    },
+    [],
+  )
+    ;
 }

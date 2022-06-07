@@ -3,18 +3,19 @@ import { isEnvironment } from "functions/environment"
 
 export const AVAILABLE_NETWORKS: number[] = [
   ChainId.MAINNET,
-  ChainId.MATIC,
-  ChainId.FANTOM,
-  ChainId.ARBITRUM,
-  ChainId.OKEX,
-  ChainId.HECO,
-  ChainId.BSC,
-  ChainId.XDAI,
-  ChainId.HARMONY,
-  ChainId.AVALANCHE,
-  ChainId.CELO,
-  ChainId.PALM,
-  ChainId.MOONRIVER,
+  ChainId.LUX,
+  // ChainId.MATIC,
+  // ChainId.FANTOM,
+  // ChainId.ARBITRUM,
+  // ChainId.OKEX,
+  // ChainId.HECO,
+  // ChainId.BSC,
+  // ChainId.XDAI,
+  // ChainId.HARMONY,
+  // ChainId.LUX,
+  // ChainId.CELO,
+  // ChainId.PALM,
+  // ChainId.MOONRIVER,
 ]
 
 
@@ -38,6 +39,7 @@ const Celo = '/images/networks/celo-network.jpg'
 const Palm = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/palm.jpg'
 const Moonriver = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/moonriver.jpg'
 const Hardhat = 'https://raw.githubusercontent.com/nomiclabs/hardhat/master/docs/.vuepress/public/favicon-32x32.png'
+const Lux = 'https://lux.wpkt.cash/LuxLogoLarge.png'
 export const NETWORK_ICON = {
   [ChainId.MAINNET]: Mainnet,
   [ChainId.ROPSTEN]: Ropsten,
@@ -54,8 +56,8 @@ export const NETWORK_ICON = {
   [ChainId.ARBITRUM]: Arbitrum,
   [ChainId.ARBITRUM_TESTNET]: Arbitrum,
   [ChainId.MOONBEAM_TESTNET]: Moonbeam,
-  [ChainId.AVALANCHE]: Avalanche,
-  [ChainId.AVALANCHE_TESTNET]: Avalanche,
+  [ChainId.LUX]: Lux,
+  [ChainId.LUX_TESTNET]: Lux,
   [ChainId.HECO]: Heco,
   [ChainId.HECO_TESTNET]: Heco,
   [ChainId.HARMONY]: Harmony,
@@ -85,8 +87,8 @@ export const NETWORK_LABEL: { [chainId: number]: string } = {
   [ChainId.BSC]: 'BSC',
   [ChainId.BSC_TESTNET]: 'BSC Testnet',
   [ChainId.MOONBEAM_TESTNET]: 'Moonbase',
-  [ChainId.AVALANCHE]: 'Avalanche',
-  [ChainId.AVALANCHE_TESTNET]: 'Fuji',
+  [ChainId.LUX]: 'Lux',
+  [ChainId.LUX_TESTNET]: 'LuxT',
   [ChainId.HECO]: 'HECO',
   [ChainId.HECO_TESTNET]: 'HECO Testnet',
   [ChainId.HARMONY]: 'Harmony',
@@ -106,6 +108,8 @@ export const DEFAULT_METAMASK_CHAIN_ID = [ChainId.MAINNET, ChainId.RINKEBY]
 
 if (!isEnvironment('prod')) {
   AVAILABLE_NETWORKS.push(ChainId.RINKEBY)
+  AVAILABLE_NETWORKS.push(ChainId.LUX_TESTNET)
+
 }
 
 export const SUPPORTED_NETWORKS: {
@@ -225,12 +229,23 @@ export const SUPPORTED_NETWORKS: {
     ],
     blockExplorerUrls: ['https://explorer.harmony.one/'],
   },
-  [ChainId.AVALANCHE]: {
+  [ChainId.LUX]: {
     chainId: '0xA86A',
-    chainName: 'Avalanche',
+    chainName: 'Lux',
     nativeCurrency: {
-      name: 'Avalanche Token',
-      symbol: 'AVAX',
+      name: 'Lux Chain',
+      symbol: 'LUX',
+      decimals: 18,
+    },
+    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://cchain.explorer.avax.network'],
+  },
+  [ChainId.LUX_TESTNET]: {
+    chainId: '0xA86A',
+    chainName: 'Lux',
+    nativeCurrency: {
+      name: 'Lux TESTNET',
+      symbol: 'LUX',
       decimals: 18,
     },
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],

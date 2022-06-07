@@ -11,3 +11,5 @@ export { Okex } from './Okex';
 export { xDai } from './xDai';
 export { Palm } from './Palm';
 export { Fuse } from './Fuse';
+export { Lux } from './Lux';
+
