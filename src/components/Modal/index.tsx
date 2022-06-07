@@ -100,7 +100,8 @@ export default function Modal({
               >
                 <div
                   style={{
-                    minHeight: isMax ? "100vh" : `${minHeight}vh`,
+                    // minHeight: isMax ? "100vh" : `${minHeight}vh`,
+                    minHeight: `${minHeight}vh`,
                     maxHeight: scrollable ? "auto" : `${maxHeight}vh`,
                   }}
                 >

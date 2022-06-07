@@ -27,7 +27,7 @@ const TransactionDetail = () => {
   };
 
   return (
-    <div className={`w-full rounded-3xl ${show && "bg-primary"} text-white`}>
+    <div className={`w-full rounded-3xl ${show && "bg-red"} text-white`}>
       <div
         className={`flex items-center justify-center cursor-pointer ${
           show && "border-b border-grey-50 py-5"
