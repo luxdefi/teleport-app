@@ -90,11 +90,12 @@ function CurrencySearchModal({
       : 75;
   return (
     <Modal
-      maxWidth={800}
+      // maxWidth={800}
       isOpen={isOpen}
       onDismiss={onDismiss}
-      minHeight={minHeight}
+      // minHeight={minHeight}
       maxHeight={85}
+      isMax={true}
       noPadding
     >
       {modalView === CurrencyModalView.search ? (

@@ -74,7 +74,13 @@ function StatusIcon({ connector }: { connector: Connector }) {
   }
 }
 
-function Web3StatusInner({ title }: { title?: string }) {
+function Web3StatusInner({
+  title,
+  className,
+}: {
+  title?: string;
+  className?: string;
+}) {
   const { account, connector, chainId } = useActiveWeb3React();
   const toggleWalletModal = useWalletModalToggle();
   // const [openAccount, setOpenAccount] = useState<boolean>(false);
@@ -104,7 +110,7 @@ function Web3StatusInner({ title }: { title?: string }) {
     return (
       <Web3Connect
         title={title}
-        // className={className}
+        className={className}
         // style={{
         //   paddingTop: "6px",
         //   paddingBottom: "6px",
@@ -143,7 +149,7 @@ export default function Web3Status({
   //};
   return (
     <>
-      <Web3StatusInner title={title} />
+      <Web3StatusInner title={title} className={className} />
       <WalletModal ENSName={undefined} />
       <NetworkModal />
     </>

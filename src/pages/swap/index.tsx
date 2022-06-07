@@ -160,7 +160,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center flex-grow w-full h-full mt-24">
+    <main className="px-2 sm:px-0 flex flex-col items-center justify-center flex-grow w-full h-full mt-24">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
         <Head>
           <title>LUX | BRIDGE</title>

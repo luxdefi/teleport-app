@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Hamburger from "hamburger-react";
 
 import ExternalLink from "../ExternalLink";
 import Image from "next/image";
@@ -14,6 +15,7 @@ import useBalances from "hooks/useBalance";
 import { useGetLuxBalance } from "state/Lux/hooks";
 import { formatBalance } from "functions/format";
 import { SUPPORTED_NETWORKS } from "config/networks";
+import MenuIcon from "components/Icons/MenuIcon";
 // import { ChainId } from '../../config/networks'
 
 // import { ExternalLink, NavLink } from "./Link";
@@ -21,6 +23,8 @@ import { SUPPORTED_NETWORKS } from "config/networks";
 
 function AppBar(): JSX.Element {
   const { account, chainId, library, accounts } = useActiveWeb3React();
+  const [activeType, setActiveType] = useState<string>("swap");
+  const [isOpen, setOpen] = useState<boolean>(false);
 
   const balances = useBalances(library, accounts);
   const getBalance = useGetLuxBalance();
@@ -38,7 +42,7 @@ function AppBar(): JSX.Element {
           <>
             <div className="px-4 py-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
+                <div className="flex items-center gap-x-4 relative">
                   {/* <Image src="/logo.png" alt="Sushi" width="32px" height="32px" /> */}
 
                   <NavLink href="/swap">
@@ -47,28 +51,47 @@ function AppBar(): JSX.Element {
                         src="/lux_logo.svg"
                         className="w-10"
                         alt="Logo"
-                        width={32}
-                        height={32}
+                        width={92}
+                        height={50}
                       />
                     </div>
                   </NavLink>
-                  <div className="hidden sm:block sm:ml-4">
-                    <div className="flex space-x-2">
-                      <NavLink href={"/swap"}>
-                        <a
-                          id={`swap-nav-link`}
-                          className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
-                        >
-                          Swap
-                        </a>
-                      </NavLink>
-                    </div>
-                  </div>
+                  <button className="hidden sm:flex outline-none w-12 h-12 justify-center items-center rounded-full bg-accent bg-opacity-0 transition-colors ease-in-out delay-75 hover:bg-opacity-30 ">
+                    <Hamburger
+                      size={20}
+                      color="#4F46E5"
+                      toggled={isOpen}
+                      toggle={setOpen}
+                    />
+                  </button>
+
+                  <MenuDropdown isOpen={isOpen} />
                 </div>
 
-                <div className="fixed bottom-0 left-0 z-10 flex flex-row items-center justify-center w-full p-4 lg:w-auto bg-dark-1000 lg:relative lg:p-0 lg:bg-transparent">
-                  <div className="flex items-center justify-between w-full space-x-2 sm:justify-end">
-                    {/* {chainId && [ChainId.MAINNET].includes(chainId) && library && library.provider.isMetaMask && (
+                <div className="hidden sm:flex">
+                  <SwitchBtn
+                    title="Swap"
+                    href="/swap"
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                  />
+                  <SwitchBtn
+                    title="Earn"
+                    href="/earn"
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                  />
+                </div>
+
+                <div className="flex items-center gap-x-4">
+                  {/* <button className="outline-none border border-accent bg-transparent flex justify-center items-center h-[55px] min-w-[120px] rounded-[60px]">
+                    <h1 className="p-2 text-baseline text-white font-medium md:p-3 whitespace-nowrap">
+                      Buy Lux
+                    </h1>
+                  </button> */}
+                  <div className="fixed bottom-0 left-0 z-10 flex flex-row items-center justify-center w-full p-4 lg:w-auto bg-dark-1000 lg:relative lg:p-0 lg:bg-transparent">
+                    <div className="flex items-center justify-between w-full space-x-2 sm:justify-end">
+                      {/* {chainId && [ChainId.MAINNET].includes(chainId) && library && library.provider.isMetaMask && (
                       <>
                         <QuestionHelper text={i18n._(t`Add xSUSHI to your MetaMask wallet`)}>
                           <div
@@ -160,36 +183,41 @@ function AppBar(): JSX.Element {
                       </>
                     )} */}
 
-                    {library && library.provider.isMetaMask && (
-                      <div className="hidden sm:inline-block">
-                        <Web3Network />
-                      </div>
-                    )}
-
-                    <div className="w-auto flex items-center rounded bg-dark-900 hover:bg-dark-800 p-0.5 whitespace-nowrap text-sm font-bold cursor-pointer select-none pointer-events-auto">
-                      {account && chainId && (
-                        <>
-                          <div className="px-3 py-2 text-white text-bold">
-                            {balances?.[0]
-                              ? ` ${formatBalance(balances[0], 18, 3)}`
-                              : null}{" "}
-                            {/* {NATIVE[chainId]?.symbol || "ETH"} */}
-                            {SUPPORTED_NETWORKS[chainId]?.nativeCurrency
-                              ?.symbol || "ETH"}
-                          </div>
-                        </>
+                      {library && library.provider.isMetaMask && (
+                        <div className="hidden sm:inline-block">
+                          <Web3Network />
+                        </div>
                       )}
-                      <Web3Status title="Connect Wallet" />
-                    </div>
-                    {/* <div className="hidden md:block">
+
+                      <div className="hidden sm:flex w-auto items-center justify-center bg-accent hover:bg-opacity-90 h-[60px] min-w-[185px] rounded-[60px] p-0.5 whitespace-nowrap text-sm font-bold cursor-pointer select-none pointer-events-auto">
+                        {account && chainId && (
+                          <>
+                            <div className="px-3 py-2 text-white text-bold">
+                              {balances?.[0]
+                                ? ` ${formatBalance(balances[0], 18, 3)}`
+                                : null}{" "}
+                              {/* {NATIVE[chainId]?.symbol || "ETH"} */}
+                              {SUPPORTED_NETWORKS[chainId]?.nativeCurrency
+                                ?.symbol || "ETH"}
+                            </div>
+                          </>
+                        )}
+                        <Web3Status
+                          title="Connect to Wallet"
+                          className="text-white"
+                        />
+                      </div>
+                      {/* <div className="hidden md:block">
                       <LanguageSwitch />
                     </div> */}
-                    {/* <More /> */}
+                      {/* <More /> */}
+                    </div>
                   </div>
                 </div>
+
                 <div className="flex -mr-2 sm:hidden">
                   {/* Mobile menu button */}
-                  <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-high-emphesis focus:outline-none">
+                  <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-accent  focus:outline-none">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <svg
@@ -235,7 +263,7 @@ function AppBar(): JSX.Element {
                 <Link href="/swap">
                   <a
                     id={`swap`}
-                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                    className="p-2 text-baseline text-white hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
                   >
                     SWAP
                   </a>
@@ -250,3 +278,61 @@ function AppBar(): JSX.Element {
 }
 
 export default AppBar;
+
+const SwitchBtn = ({ href, title, activeType, setActiveType }) => {
+  const isActive = activeType.toLowerCase() === title.toLowerCase();
+
+  return (
+    <div
+      onClick={() => setActiveType(title)}
+      className={`cursor-pointer flex justify-center items-center h-12 min-w-[100px] rounded-[60px]  ${
+        isActive ? "bg-[#161827]" : "bg-transparent"
+      }`}
+    >
+      <NavLink href={href || "/swap"}>
+        <a
+          id={`swap-nav-link`}
+          className="p-2 text-baseline text-white font-medium hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+        >
+          {title}
+        </a>
+      </NavLink>
+    </div>
+  );
+};
+
+const MenuDropdown = ({ isOpen }) => {
+  return (
+    <div
+      className={`absolute left-0 top-14 z-50 pl-7 pr-10 py-8 space-y-8 bg-[#131522] rounded-2xl transition-transform ${
+        !isOpen
+          ? "scale-0 opacity-0 pointer-events-none"
+          : "scale-100 opacity-100 pointer-events-auto"
+      }`}
+    >
+      <MenuButton title="Referral Program" icon={<MenuIcon />} />
+      <MenuButton title="Setup Widget" icon={<MenuIcon />} />
+      <MenuButton title="SDK" icon={<MenuIcon />} />
+      <MenuButton title="Fiat on-ramp" icon={<MenuIcon />} />
+      <MenuButton title="About" icon={<MenuIcon />} />
+      <MenuButton title="FAQ" icon={<MenuIcon />} />
+      <MenuButton title="Rubic Bridge" icon={<MenuIcon />} />
+    </div>
+  );
+};
+
+interface MenuButtonProps {
+  title: string;
+  icon?: JSX.Element;
+}
+
+const MenuButton = ({ title, icon }: MenuButtonProps) => {
+  return (
+    <div className="cursor-pointer flex items-center gap-x-4">
+      {icon || <MenuIcon />}
+      <h1 className="text-sm text-white font-bold whitespace-nowrap">
+        {title}
+      </h1>
+    </div>
+  );
+};
