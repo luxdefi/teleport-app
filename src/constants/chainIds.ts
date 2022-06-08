@@ -1,4 +1,4 @@
-import { Avalanche, Binance, Celo, Ether, Fantom, Fuse, Harmony, Heco, Matic, Movr, Okex, Palm, xDai } from './entities/Native';
+import { Avalanche, Binance, Celo, Ether, Fantom, Fuse, Harmony, Heco, Matic, Movr, Okex, Palm, xDai, Lux } from './entities/Native';
 
 export enum ChainId {
   MAINNET = 1,
@@ -16,8 +16,8 @@ export enum ChainId {
   ARBITRUM = 42161,
   ARBITRUM_TESTNET = 79377087078960,
   MOONBEAM_TESTNET = 1287,
-  AVALANCHE = 43114,
-  AVALANCHE_TESTNET = 43113,
+  LUX = 43114,
+  LUX_TESTNET = 43113,
   HECO = 128,
   HECO_TESTNET = 256,
   HARMONY = 1666600000,
@@ -46,8 +46,8 @@ export declare const NATIVE: {
   56: Binance;
   97: Binance;
   42161: Ether;
-  43114: Avalanche;
-  43113: Avalanche;
+  43114: Lux;
+  43113: Lux;
   128: Heco;
   256: Heco;
   1666600000: Harmony;

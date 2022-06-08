@@ -30,6 +30,14 @@ import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { NETWORK_LABEL, SUPPORTED_NETWORKS } from "config/networks";
 import ListCard from "components/Swap/ListCard";
+import {
+  useLbtcContract,
+  useTeleportEthContract,
+  useTeleportLuxContract,
+} from "hooks/useContract";
+import { Contract } from "ethers";
+import addresses from "constants/addresses";
+import Web3 from "web3";
 
 interface SwapProps {}
 
@@ -37,7 +45,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const { library, connector, chainId, account } = useActiveWeb3React();
   const { loading } = useSelector((state: any) => state.swap);
   const { Moralis, initialize } = useMoralis();
-
+  const teleportLuxContract = useTeleportLuxContract();
+  const teleportEthContract = useTeleportEthContract();
+  const lBTCContract = useLbtcContract();
   const dispatch = useDispatch();
   const toggleWalletModal = useWalletModalToggle();
   const getAvailableTokens = useGetAvailableTokens();
@@ -46,6 +56,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const swapTokens = useSwap();
   const getQuote = useGetQuote();
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false);
+  const [TeleportContractBurn, setTeleportContractBurn] = useState<any>();
+  const [TeleportContractMint, setTeleportContractMint] = useState<Contract>();
+  const [fromTeleportAddr, setFromTeleportAddr] = useState("");
+  const [evmToAddress, setEvmToAddress] = useState("");
   const router = useRouter();
   // get query
   const query = router.query;
@@ -159,18 +173,195 @@ const Swap: React.FC<SwapProps> = ({}) => {
     dispatch(updateCurrentAmount(newAmount));
   };
 
-  console.log(
-    "first_dict",
-    (query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
-      query?.to &&
-      query?.from &&
-      query?.to === query?.from
-      ? true
-      : false
-  );
+  //BRIDGE FUNCTIONS
+  async function checkBalanceInput(value) {
+    const LBTC_From_Con = await setNets();
+    const usrBalance = Web3.utils.fromWei(
+      (await LBTC_From_Con.balanceOf(account)).toString(),
+      "ether"
+    );
+
+    console.log(
+      "User Balance:",
+      Number(value),
+      Number(usrBalance),
+      Number(value) > Number(usrBalance)
+    );
+
+    if (value && usrBalance) {
+      if (Number(value) > Number(usrBalance)) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  async function handleInput() {
+    setNets();
+
+    const msgSig = await library.signer.signMessage(
+      "Sign to prove you are initiator of transaction."
+    );
+    try {
+      const amt = Web3.utils.toWei(currentAmount[Field.INPUT].toString()); // Convert intialAmt toWei
+      console.log("TeleportContractBurn:", TeleportContractBurn.address);
+
+      const tx = await TeleportContractBurn.bridgeBurn(
+        amt,
+        currentTrade[Field.INPUT].address
+      ); // Burn coins
+
+      let cnt = 0;
+
+      // Listen for burning completion
+      TeleportContractBurn.once("BridgeBurned", async (caller, amount) => {
+        console.log("Recipient:", caller);
+        console.log("Amount:", amount.toString());
+
+        if (cnt == 0) {
+          handleMint(amount, cnt, query?.fromChain, query?.toChain, tx, msgSig);
+          cnt++;
+        }
+      });
+
+      var receipt = await tx.wait();
+      console.log("Receipt:", receipt, receipt.status === 1);
+
+      if (receipt.status !== 1) {
+        console.log("Transaction Failure.");
+
+        return;
+      } else {
+        console.log("Receipt received");
+        TeleportContractBurn.off("BridgeBurned");
+        TeleportContractBurn.removeAllListeners(["BridgeBurned"]);
+
+        if (cnt == 0) {
+          console.log(
+            "cookie array:",
+            amt,
+            cnt,
+            tx,
+            currentAmount[Field.INPUT].name
+          );
+          await handleMint(
+            amt,
+            cnt,
+            query?.fromChain,
+            query?.toChain,
+            tx,
+            msgSig
+          );
+          cnt++;
+        }
+      }
+    } catch (err) {
+      console.log("Error:", err);
+      return;
+    }
+  }
+
+  function setNets() {
+    const LBTC_From_Con = lBTCContract(currentTrade[Field.INPUT].address);
+    const fromNetRadio = currentTrade[Field.INPUT].name;
+    const toNetRadio = currentTrade[Field.OUTPUT].name;
+    if (fromNetRadio == "LUX" && toNetRadio == "Ethereum") {
+      // && tokenName == "LuxBTC" => check if token is LBTC or LETH
+
+      setTeleportContractBurn(teleportLuxContract); //set contract burn to teleport lux contract
+      setTeleportContractMint(teleportEthContract); //set contract mint to teleport eth contract
+      setFromTeleportAddr(addresses.Teleport_Lux);
+    } else if (fromNetRadio == "Ethereum" && toNetRadio == "LUX") {
+      setTeleportContractBurn(teleportEthContract); //set contract burn to teleport eth contract
+      setTeleportContractMint(teleportLuxContract); //set contract mint to teleport lux contract
+      setFromTeleportAddr(addresses.Teleport_Eth);
+    }
+    return LBTC_From_Con;
+  }
+
+  //async function handleMint(amount, cnt, fromNetId, toNetId, receipt, tx){
+  async function handleMint(amount, cnt, fromNetId, toNetId, tx, msgSig) {
+    const amtNoWei = Web3.utils.fromWei(amount.toString());
+    console.log("amtNoWei", Number(amtNoWei), "cnt", cnt);
+    const txid = tx.hash;
+    console.log("txid:", txid);
+
+    if (Number(amtNoWei) > 0 && cnt == 0) {
+      console.log("bridge received coins with transaction has", txid);
+
+      const toNetIdHash = Web3.utils.keccak256(toNetId.toString());
+      const toTargetAddrHash = Web3.utils.keccak256(evmToAddress); //Web3.utils.keccak256(evmToAddress.slice(2));
+      const toTokenAddrHash = Web3.utils.keccak256(
+        currentTrade[Field.OUTPUT].address
+      ); //Web3.utils.keccak256(toTokenAddress.slice(2));
+      console.log(
+        "toTargetAddrHash",
+        toTargetAddrHash,
+        "toNetIdHash",
+        toNetIdHash,
+        "toTokenAddrHash",
+        toTokenAddrHash
+      );
+      //var cmd = "http://localhost:5000/api/v1/getsig/txid/"+txid+"/fromNetId/"+fromNetId+"/toNetIdHash/"+toNetIdHash+"/tokenName/"+tokenName+"/tokenAddrHash/"+toTokenAddrHash+"/msgSig/"+msgSig+"/toTargetAddrHash/"+toTargetAddrHash;
+      const cmd =
+        "https://teleporter.wpkt.cash/api/v1/getsig/txid/" +
+        txid +
+        "/fromNetId/" +
+        fromNetId +
+        "/toNetIdHash/" +
+        toNetIdHash +
+        "/tokenName/" +
+        currentTrade[Field.OUTPUT].name +
+        "/tokenAddrHash/" +
+        toTokenAddrHash +
+        "/msgSig/" +
+        msgSig +
+        "/toTargetAddrHash/" +
+        toTargetAddrHash;
+
+      console.log("cmd", cmd);
+
+      fetch(cmd)
+        .then((response) => response.json())
+        .then(async (result) => {
+          console.log("Data:", result);
+
+          if (result.signature && result.hashedTxId) {
+            // Set globals
+            console.log("result here", result);
+          } else if (Number(result.output) === -1) {
+            console.log("Duplicate transaction.");
+            return;
+          } else if (Number(result.output) === -3) {
+            console.log("Gas price error.");
+            return;
+          } else if (Number(result.output) === -4) {
+            console.log("Unknown Error.");
+            return;
+          } else if (Number(result.output) === -5) {
+            console.log("Front Run Attempt.");
+            return;
+          } else {
+            console.log("Bad transaction.");
+            return;
+          }
+        })
+        .catch(async function (err) {
+          console.log("error", err);
+          return;
+        });
+
+      return;
+    } else {
+      return;
+    }
+  }
 
   return (
-    <main className="flex flex-col items-center justify-center flex-grow w-full h-full mt-24">
+    <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
         <Head>
           <title>LUX | BRIDGE</title>
@@ -244,9 +435,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 onTokenChange={from}
               />
             </div>
-            <div className="grid py-3 relative">
+            <div className="relative grid py-3">
               <hr className="h-px bg-[#323546] opacity-30 block absolute w-full top-[50%] z-[1]" />
-              <div className="flex flex-wrap justify-center w-full px-4 z-10">
+              <div className="z-10 flex flex-wrap justify-center w-full px-4">
                 <button
                   className="-mt-6 -mb-6 rounded-full"
                   onClick={() => {
@@ -255,7 +446,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 >
                   <div className="p-1 rounded-full bg-secondary">
                     <div
-                      className="py-1 rounded-full flex flex-col justify-center"
+                      className="flex flex-col justify-center py-1 rounded-full"
                       onMouseEnter={() => setAnimateSwapArrows(true)}
                       onMouseLeave={() => setAnimateSwapArrows(false)}
                     >
@@ -370,17 +561,17 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 </div>
               </div>
             )}
-          <div className="mt-1 px-5">
+          <div className="px-5 mt-1">
             {!account ? (
               <div
-                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={toggleWalletModal}
               >
                 Connect Wallet
               </div>
             ) : (
               <button
-                className="w-full px-6 py-4 text-base text-center border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 text-white border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={async () => {
                   if (chainId !== Number(query?.fromChain)) {
                     // connector.activate(Number(query?.fromChain));

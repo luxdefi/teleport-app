@@ -203,16 +203,16 @@ export function CurrencySearch({
   }, [getAvailableTokens, selectedNetwork]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full pb-5">
       <ModalHeader
         title="Token List"
         titleClassName="text-white text-2xl font-semibold"
         className="px-6 py-5 bg-space-grey"
         onClose={onDismiss}
       />
-      <div className="flex h-full flex-col pl-6 pr-6 min-w-[82vw] md:min-w-[400px]">
+      <div className="flex h-full flex-col pl-6 pr-6 w-full min-w-[82vw] md:min-w-[400px]">
         {!currencyList && (
-          <div className=" mt-0 mb-3 sm:mt-3 sm:mb-8">
+          <div className="mt-0 mb-3 sm:mt-3 sm:mb-8">
             <div className="relative">
               <div className="absolute inset-0 max-w-[40px] flex items-center justify-start pl-5">
                 <Image src="/icons/search.svg" alt="" width={14} height={14} />
@@ -232,8 +232,8 @@ export function CurrencySearch({
           </div>
         )}
 
-        <div className="flex gap-3 h-full">
-          <div className="flex flex-wrap w-[28%] bg-dark-300 max-h-[400px] overflow-y-auto rounded-2xl px-1">
+        <div className="flex w-full h-full gap-3">
+          <div className="items-start justify-start px-1 overflow-y-auto max-w-1/9 bg-dark-1000 rounded-2xl">
             {AVAILABLE_NETWORKS.map((network: number) => (
               <div
                 key={network}
@@ -241,7 +241,7 @@ export function CurrencySearch({
                   setSelectedNetwork(network);
                   onChainChange(network);
                 }}
-                className="flex flex-col items-center justify-center w-1/2 py-1.5 px-3 cursor-pointer "
+                className="flex flex-col items-center justify-center w-full h-20 py-1.5 px-3 cursor-pointer "
               >
                 <div
                   className={`flex flex-col items-center justify-center w-16 h-16 rounded ${
