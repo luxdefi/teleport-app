@@ -608,18 +608,35 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 }}
                 id="swap-button"
                 disabled={
-                  error || ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
+                  (chainId === Number(query?.fromChain ?? 1) &&
+                    ((query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
+                    query?.to &&
+                    query?.from &&
+                    query?.to === query?.from
+                      ? true
+                      : false)) ||
+                  error ||
+                  ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
                 }
               >
                 {loading ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : chainId !== Number(query?.fromChain) ? (
-                  `switch to ${NETWORK_LABEL[Number(query?.fromChain)]} network`
-                ) : error ? (
-                  error.description
-                ) : (
-                  "Swap"
-                )}
+                ) : query?.fromChain && chainId !== Number(query?.fromChain) ? (
+                  `switch to ${
+                    NETWORK_LABEL[Number(query?.fromChain) || 1]
+                  } network` ? (
+                    (query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
+                    query?.to &&
+                    query?.from &&
+                    query?.to === query?.from ? (
+                      "Cannot swap same token"
+                    ) : error ? (
+                      error.description
+                    ) : (
+                      "Swap"
+                    )
+                  ) : null
+                ) : null}
               </button>
             )}
           </div>
