@@ -35,40 +35,50 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   const { Moralis } = useMoralis();
 
   // console.log("activeChainToFetch", activeChain, aChain);
-  return useCallback(async () => {
-    try {
-      const result: { tokens: Token[] } =
-        await Moralis.Plugins.oneInch.getSupportedTokens({
-          chain:
-            SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
-        });
-      const customToken = {
-        decimals: 18,
-        symbol: "LUX",
-        address: chainAddresses.LUX,
-        logoURI: window.location.origin + "/lux_logo.svg",
-        name: "LUX",
-      };
-      const resultTokens = result.tokens;
-      resultTokens[chainAddresses.LUX] = customToken;
-      dispatch(fetchTokens({ [activeChain]: resultTokens }));
+  return useCallback(
+    async (chain) => {
+      try {
+        console.log(
+          "selectedNetwork_num",
+          SUPPORTED_NETWORKS[chain].nativeCurrency.symbol.toLowerCase()
+        );
 
-      const from = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "ETH"
-      );
-      const to = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "LUX"
-      );
-      // dispatch(
-      //   updateCurrentTrade({
-      //     to: { ...to, isNative: to.symbol === "ETH" },
-      //     from: { ...from, isNative: from.symbol === "ETH" },
-      //   })
-      // );
-    } catch (error) {
-      console.log("error in useGetAvailableTokens", error);
-    }
-  }, [Moralis.Plugins.oneInch, activeChain, chainAddresses.LUX, dispatch]);
+        const result: { tokens: Token[] } =
+          await Moralis.Plugins.oneInch.getSupportedTokens({
+            chain:
+              SUPPORTED_NETWORKS[chain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+          });
+        const customToken = {
+          decimals: 18,
+          symbol: "LUX",
+          address: chainAddresses.LUX,
+          logoURI: window.location.origin + "/lux_logo.svg",
+          name: "LUX",
+        };
+        const resultTokens = result.tokens;
+        resultTokens[chainAddresses.LUX] = customToken;
+        dispatch(fetchTokens({ [activeChain]: resultTokens }));
+
+        console.log("selectedNetwork_num_2", resultTokens);
+
+        const from = Object.values(resultTokens).find(
+          (val: any) => val.symbol === "ETH"
+        );
+        const to = Object.values(resultTokens).find(
+          (val: any) => val.symbol === "LUX"
+        );
+        // dispatch(
+        //   updateCurrentTrade({
+        //     to: { ...to, isNative: to.symbol === "ETH" },
+        //     from: { ...from, isNative: from.symbol === "ETH" },
+        //   })
+        // );
+      } catch (error) {
+        console.log("error in useGetAvailableTokens", error);
+      }
+    },
+    [Moralis.Plugins.oneInch, activeChain, chainAddresses.LUX, dispatch]
+  );
   // const supported_networks = SUPPORTED_NETWORKS;
   // const native = NATIVE;
   // console.log("chainId ==>", native, supported_networks);
