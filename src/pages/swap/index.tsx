@@ -173,7 +173,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   //BRIDGE FUNCTIONS
   const lBTCContract = useLbtcContract(
-    "0x526903Ee6118de6737D11b37f82fC7f69B13685D"
+    "0x526903Ee6118de6737D11b37f82fC7f69B13685D" //NOTE Make this dynamic
   );
 
   async function checkBalanceInput(value) {
