@@ -1,7 +1,8 @@
+import { shortenAddress, shortenString } from "functions/format";
 import Image from "next/image";
 import React, { useState } from "react";
 
-const TransactionDetail = () => {
+const TransactionDetail = ({ evmToAddress }) => {
   const [show, setShow] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -43,11 +44,11 @@ const TransactionDetail = () => {
             transform: show ? "rotate(0deg)" : "rotate(180deg)",
           }}
         />
-        <p className="text-center text-primary-300 ml-3">Transaction Details</p>
+        <p className="ml-3 text-center text-primary-300">Transaction Details</p>
       </div>
       {show && (
         <>
-          <div className="flex flex-col p-5 cursor-pointer  border-b border-grey-50">
+          <div className="flex flex-col p-5 border-b cursor-pointer border-grey-50">
             <div className="flex items-center justify-between mb-3.5">
               <p>Network fee</p>
               <p>0.000084 ETH ≈ $0.161</p>
@@ -57,7 +58,7 @@ const TransactionDetail = () => {
               <p>0.3% ≈ 123.67 USDC</p>
             </div>
           </div>
-          <div className="flex flex-col p-5 cursor-pointer  border-b border-grey-50">
+          <div className="flex flex-col p-5 border-b cursor-pointer border-grey-50">
             <div className="flex items-center justify-between mb-3.5">
               <p>Price impact in source network</p>
               <p>0.16%</p>
@@ -74,16 +75,18 @@ const TransactionDetail = () => {
           <div className="flex flex-col p-5 cursor-pointer">
             <div className="flex items-center justify-between">
               <p>You will receive Polygon tokens at this address</p>
-              <div className="flex items-center cursor-pointer relative">
+              <div className="relative flex items-center cursor-pointer">
                 {isCopied && (
-                  <h1 className="text-sm text-green font-medium absolute -top-7">
+                  <h1 className="absolute text-sm font-medium text-green -top-7">
                     Copied!
                   </h1>
                 )}
-                <p className="mr-8">0x997...e41a4</p>
+                <p className="mr-8">
+                  {evmToAddress && shortenAddress(evmToAddress || "")}
+                </p>
                 <button
-                  onClick={() => handleCopyClick("0x997...e41a4")}
-                  className="outline-none flex justify-center items-center"
+                  onClick={() => handleCopyClick(evmToAddress)}
+                  className="flex items-center justify-center outline-none"
                 >
                   <Image src="/icons/copy.svg" alt="" width={16} height={16} />
                 </button>

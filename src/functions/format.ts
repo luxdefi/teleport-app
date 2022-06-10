@@ -3,6 +3,7 @@ import { formatUnits } from '@ethersproject/units'
 import { BigNumberish } from '@ethersproject/bignumber'
 import { TokenSelect } from 'state/types'
 import { Field } from 'state/swap/action'
+import { isAddress } from './validate'
 
 export const capitalize = (s) => {
   if (typeof s !== 'string') return ''
@@ -12,6 +13,7 @@ export const capitalize = (s) => {
 // shorten the checksummed version of the input address to have 0x + 4 characters at start and end
 export function shortenAddress(address: string, chars = 4): string {
   try {
+    if (!isAddress(address)) return;
     const parsed = getAddress(address)
     return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
   } catch (error) {

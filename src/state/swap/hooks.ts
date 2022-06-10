@@ -29,7 +29,12 @@ export function useGetAvailableTokens(): (chain?: number) => void {
     (state: AppState) => state.swap.activeChain
   );
   const aChain = useSelector((state: AppState) => state.swap);
-  const chainAddresses: { LUX: string } =
+  const chainAddresses: {
+    LBTC: string
+    LETH: string;
+    LUSD: string
+    TELEPORT: string;
+  } =
     (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
   const dispatch = useDispatch();
   const { Moralis } = useMoralis();
@@ -42,33 +47,45 @@ export function useGetAvailableTokens(): (chain?: number) => void {
           chain:
             SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
         });
-      const customToken = {
+      const customTokens = [{
         decimals: 18,
-        symbol: "LUX",
-        address: chainAddresses.LUX,
-        logoURI: window.location.origin + "/lux_logo.svg",
-        name: "LUX",
-      };
-      const resultTokens = result.tokens;
-      resultTokens[chainAddresses.LUX] = customToken;
+        symbol: "LBTC",
+        address: chainAddresses.LBTC,
+        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        name: "LuxBTC",
+      }, {
+        decimals: 18,
+        symbol: "LETH",
+        address: chainAddresses.LETH,
+        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        name: "LuxETH",
+      }, {
+        decimals: 18,
+        symbol: "LUSD",
+        address: chainAddresses.LUSD,
+        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        name: "LuxUSD",
+      }];
+      const resultTokens = customTokens;
+      // resultTokens[chainAddresses.LUX] = customToken;
       dispatch(fetchTokens({ [activeChain]: resultTokens }));
 
       const from = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "ETH"
+        (val: any) => val.symbol === "LBTC"
       );
       const to = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "LUX"
+        (val: any) => val.symbol === "LETH"
       );
-      // dispatch(
-      //   updateCurrentTrade({
-      //     to: { ...to, isNative: to.symbol === "ETH" },
-      //     from: { ...from, isNative: from.symbol === "ETH" },
-      //   })
-      // );
+      dispatch(
+        updateCurrentTrade({
+          to: { ...to, isNative: to.symbol === "ETH" },
+          from: { ...from, isNative: from.symbol === "ETH" },
+        })
+      );
     } catch (error) {
       console.log("error in useGetAvailableTokens", error);
     }
-  }, [Moralis.Plugins.oneInch, activeChain, chainAddresses.LUX, dispatch]);
+  }, [Moralis.Plugins.oneInch, activeChain, chainAddresses, dispatch]);
   // const supported_networks = SUPPORTED_NETWORKS;
   // const native = NATIVE;
   // console.log("chainId ==>", native, supported_networks);
@@ -386,3 +403,11 @@ export const useToken = (address) => {
     ? tokens.find((token) => token.address === address)
     : null;
 };
+
+export function useBridge(): () => void {
+
+  return useCallback(async () => {
+    // let amount = Number(fromAmount * 10 ** currentTrade.from.decimals);
+
+  }, []);
+}

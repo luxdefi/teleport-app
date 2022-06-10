@@ -16,23 +16,22 @@ export function useContract(
 ): Contract | null {
   const { library, account, chainId } = useActiveWeb3React();
   let chainIdStr = chainId ? chainId.toString() : "4";
-
+  console.log('[nameOrAddress.toString()]', nameOrAddress)
   let address: string | undefined = nameOrAddress;
   // const randomWallet = ethers.Wallet.createRandom();
   // const provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/f0c1756bf77c4d8eb525375aa106ebcc') // needs to be added in .env.local || .env, it's dynamic accordin to network and chain
   // const defaultSigner = provider.getSigner(randomWallet.address);
 
   if (!isAddress(nameOrAddress) || nameOrAddress === AddressZero) {
-    address =
-      chainId === (ChainId.MAINNET || ChainId.RINKEBY)
-        ? addresses[chainIdStr][nameOrAddress.toString()] || ""
-        : "";
+    address = addresses[chainIdStr][nameOrAddress.toString()] || "";
     ABI =
       ABI || abis[chainIdStr]
         ? abis[chainIdStr][nameOrAddress.toString()]
         : null;
   }
+
   return useMemo(() => {
+
     if (!address || !ABI || !library) return null;
     try {
       const contract = getContract(
@@ -41,6 +40,7 @@ export function useContract(
         library,
         withSignerIfPossible && account ? account : undefined
       );
+      console.log('fetching contracrt', contract)
       return contract;
     } catch (error) {
       console.error("Failed to get contract", error);
@@ -52,18 +52,10 @@ export function useContract(
 export function useLuxContract(): Contract | null {
   return useContract("LUX");
 }
-export function useTeleportLuxContract(): Contract | null {
-  return useContract("TELEPORT_LUX");
+export function useTeleportContract(): Contract | null {
+  return useContract("TELEPORT");
 }
-export function useTeleportEthContract(): Contract | null {
-  return useContract("TELEPORT_ETH");
-}
-export function useLbtcContract(): (address) => Contract | null {
-  return useCallback(
-    (address) => {
-      return useContract(address)
-    },
-    [],
-  )
-    ;
+
+export function useLbtcContract(address): Contract | null {
+  return useContract(address)
 }

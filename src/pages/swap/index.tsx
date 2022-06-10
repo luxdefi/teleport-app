@@ -2,6 +2,7 @@ import useActiveWeb3React from "hooks/useActiveWeb3React";
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
+  useBridge,
   useFetchUserBalances,
   useGetAvailableTokens,
   useGetCurrentBalances,
@@ -30,14 +31,11 @@ import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { NETWORK_LABEL, SUPPORTED_NETWORKS } from "config/networks";
 import ListCard from "components/Swap/ListCard";
-import {
-  useLbtcContract,
-  useTeleportEthContract,
-  useTeleportLuxContract,
-} from "hooks/useContract";
+import { useLbtcContract, useTeleportContract } from "hooks/useContract";
 import { Contract } from "ethers";
 import addresses from "constants/addresses";
 import Web3 from "web3";
+import { isAddress } from "functions/validate";
 
 interface SwapProps {}
 
@@ -45,21 +43,21 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const { library, connector, chainId, account } = useActiveWeb3React();
   const { loading } = useSelector((state: any) => state.swap);
   const { Moralis, initialize } = useMoralis();
-  const teleportLuxContract = useTeleportLuxContract();
-  const teleportEthContract = useTeleportEthContract();
-  const lBTCContract = useLbtcContract();
+  const teleportContract = useTeleportContract();
   const dispatch = useDispatch();
   const toggleWalletModal = useWalletModalToggle();
   const getAvailableTokens = useGetAvailableTokens();
   const fetchUserBalances = useFetchUserBalances();
   const getCurrentBalances = useGetCurrentBalances();
   const swapTokens = useSwap();
+  const bridgeTokens = useBridge();
   const getQuote = useGetQuote();
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false);
   const [TeleportContractBurn, setTeleportContractBurn] = useState<any>();
   const [TeleportContractMint, setTeleportContractMint] = useState<Contract>();
   const [fromTeleportAddr, setFromTeleportAddr] = useState("");
   const [evmToAddress, setEvmToAddress] = useState("");
+
   const router = useRouter();
   // get query
   const query = router.query;
@@ -174,10 +172,13 @@ const Swap: React.FC<SwapProps> = ({}) => {
   };
 
   //BRIDGE FUNCTIONS
+  const lBTCContract = useLbtcContract(
+    "0x526903Ee6118de6737D11b37f82fC7f69B13685D"
+  );
+
   async function checkBalanceInput(value) {
-    const LBTC_From_Con = await setNets();
     const usrBalance = Web3.utils.fromWei(
-      (await LBTC_From_Con.balanceOf(account)).toString(),
+      (await lBTCContract.balanceOf(account)).toString(),
       "ether"
     );
 
@@ -200,14 +201,14 @@ const Swap: React.FC<SwapProps> = ({}) => {
   }
 
   async function handleInput() {
-    setNets();
+    await setNets();
+    const msgSig = await library
+      ?.getSigner()
+      .signMessage("Sign to prove you are initiator of transaction.");
 
-    const msgSig = await library.signer.signMessage(
-      "Sign to prove you are initiator of transaction."
-    );
     try {
       const amt = Web3.utils.toWei(currentAmount[Field.INPUT].toString()); // Convert intialAmt toWei
-      console.log("TeleportContractBurn:", TeleportContractBurn.address);
+      console.log("TeleportContractBurn:", TeleportContractBurn);
 
       const tx = await TeleportContractBurn.bridgeBurn(
         amt,
@@ -227,7 +228,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         }
       });
 
-      var receipt = await tx.wait();
+      const receipt = await tx.wait();
       console.log("Receipt:", receipt, receipt.status === 1);
 
       if (receipt.status !== 1) {
@@ -265,21 +266,27 @@ const Swap: React.FC<SwapProps> = ({}) => {
   }
 
   function setNets() {
-    const LBTC_From_Con = lBTCContract(currentTrade[Field.INPUT].address);
-    const fromNetRadio = currentTrade[Field.INPUT].name;
-    const toNetRadio = currentTrade[Field.OUTPUT].name;
-    if (fromNetRadio == "LUX" && toNetRadio == "Ethereum") {
+    console.log("currentTrade", currentTrade);
+    console.log("teleportContract", teleportContract);
+    const fromNetRadio = query?.fromChain;
+    const toNetRadio = query?.toChain;
+    console.log("chains", fromNetRadio, toNetRadio);
+    if (fromNetRadio == "43113" && toNetRadio == "4") {
       // && tokenName == "LuxBTC" => check if token is LBTC or LETH
-
-      setTeleportContractBurn(teleportLuxContract); //set contract burn to teleport lux contract
-      setTeleportContractMint(teleportEthContract); //set contract mint to teleport eth contract
+      console.log("from lux to eth chain");
+      setTeleportContractBurn(teleportContract); //set contract burn to teleport lux contract
+      setTeleportContractMint(teleportContract); //set contract mint to teleport eth contract
       setFromTeleportAddr(addresses.Teleport_Lux);
-    } else if (fromNetRadio == "Ethereum" && toNetRadio == "LUX") {
-      setTeleportContractBurn(teleportEthContract); //set contract burn to teleport eth contract
-      setTeleportContractMint(teleportLuxContract); //set contract mint to teleport lux contract
+    } else if (fromNetRadio == "4" && toNetRadio == "43113") {
+      console.log("from eth to lux chain");
+
+      setTeleportContractBurn(teleportContract); //set contract burn to teleport eth contract
+      setTeleportContractMint(teleportContract); //set contract mint to teleport lux contract
       setFromTeleportAddr(addresses.Teleport_Eth);
     }
-    return LBTC_From_Con;
+    console.log("TeleportContractBurn", TeleportContractBurn);
+    console.log("setTeleportContractMint", setTeleportContractMint);
+    console.log("fromTeleportAddr", fromTeleportAddr);
   }
 
   //async function handleMint(amount, cnt, fromNetId, toNetId, receipt, tx){
@@ -503,7 +510,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
               <CustomizedSteppers
                 steps={[
                   {
-                    label: "Uniswap V3",
+                    label: "LUX",
                     icon: 1,
                     logo: "/icons/uniswap.png",
                   },
@@ -514,7 +521,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     logo: "/icons/lux-logo.svg",
                   },
                   {
-                    label: "Livepeer",
+                    label: "Teleport",
                     icon: 3,
                     logo: "/icons/livepeer.png",
                   },
@@ -529,12 +536,12 @@ const Swap: React.FC<SwapProps> = ({}) => {
               <div className="px-5">
                 <ListCard
                   fee="$37.74"
-                  label="Via Sushiswap"
+                  label="Via Teleport"
                   amount="0.000000000491183"
                   className="flex items-center justify-between"
                 />
                 <div className="flex flex-wrap gap-x-6">
-                  <ListCard
+                  {/* <ListCard
                     fee="$37.74"
                     label="Via Uniswap V2"
                     amount="0.000000000491183"
@@ -557,21 +564,34 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     label="Via Uniswap V3"
                     amount="0.000000000491183"
                     background="bg-white-2"
-                  />
+                  /> */}
                 </div>
               </div>
             )}
-          <div className="px-5 mt-1">
+          <div className="flex px-5 mt-1">
+            <input
+              type="text"
+              id="token-search-input"
+              placeholder="Enter Destination Address"
+              autoComplete="off"
+              value={evmToAddress}
+              onChange={(e) => setEvmToAddress(e.target.value)}
+              className="w-2/3 bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-11 px-6 py-4 mr-2"
+            />
             {!account ? (
               <div
-                className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-1/3 px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={toggleWalletModal}
               >
                 Connect Wallet
               </div>
+            ) : !evmToAddress || !isAddress(evmToAddress) ? (
+              <div>
+                <p>Add a valid EVM Address</p>
+              </div>
             ) : (
               <button
-                className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-1/3 px-3 py-4 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={async () => {
                   if (chainId !== Number(query?.fromChain)) {
                     // connector.activate(Number(query?.fromChain));
@@ -604,7 +624,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                       console.error(`Switch chain error ${switchError}`);
                       // handle other "switch" errors
                     }
-                  } else swapTokens();
+                  } else handleInput();
                 }}
                 id="swap-button"
                 disabled={
@@ -626,7 +646,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
           {/* <UnsupportedCurrencyFooter show={swapIsUnsupported} currentTrade={[currentTrade.INPUT, currentTrade.OUTPUT]} /> */}
         </div>
         {query.from && query.to && currentTrade.from !== 0 && (
-          <TransactionDetail />
+          <TransactionDetail evmToAddress={evmToAddress} />
         )}
       </div>
     </main>
