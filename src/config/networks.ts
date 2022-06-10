@@ -2,8 +2,8 @@ import { ChainId } from "constants/chainIds"
 import { isEnvironment } from "functions/environment"
 
 export const AVAILABLE_NETWORKS: number[] = [
-  ChainId.MAINNET,
-  ChainId.LUX,
+  // ChainId.MAINNET,
+  // ChainId.LUX,
   // ChainId.MATIC,
   // ChainId.FANTOM,
   // ChainId.ARBITRUM,
@@ -16,6 +16,8 @@ export const AVAILABLE_NETWORKS: number[] = [
   // ChainId.CELO,
   // ChainId.PALM,
   // ChainId.MOONRIVER,
+  ChainId.RINKEBY,
+  ChainId.LUX_TESTNET
 ]
 
 
@@ -107,8 +109,8 @@ export const DEFAULT_METAMASK_CHAIN_ID = [ChainId.MAINNET, ChainId.RINKEBY]
 
 
 if (!isEnvironment('prod')) {
-  AVAILABLE_NETWORKS.push(ChainId.RINKEBY)
-  AVAILABLE_NETWORKS.push(ChainId.LUX_TESTNET)
+  // AVAILABLE_NETWORKS.push(ChainId.RINKEBY)
+  // AVAILABLE_NETWORKS.push(ChainId.LUX_TESTNET)
 
 }
 

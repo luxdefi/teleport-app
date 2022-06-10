@@ -130,11 +130,11 @@ export default function ExchangePanel({
                   />
                 </div>
               )}
-              <div className="text-lg font-semibold token-symbol-container md:text-xl text-white">
+              <div className="text-lg font-semibold text-white token-symbol-container md:text-xl">
                 {token && token.symbol ? (
                   token.symbol
                 ) : (
-                  <div className="px-2 py-1 mt-1 text-xs font-medium bg-primary-300 text-white border-low-emphesis whitespace-nowrap ">
+                  <div className="px-2 py-1 mt-1 text-xs font-medium text-white bg-primary-300 border-low-emphesis whitespace-nowrap ">
                     Select a token
                   </div>
                 )}
@@ -171,11 +171,18 @@ export default function ExchangePanel({
               debounceTimeout={2000}
             />
 
-            {value && (
-              <p className="mt-[5px] opacity-50 text-white text-xs">
-                1 ETH = 341.21549 Near
-              </p>
-            )}
+            {!hideBalance && token && selectedCurrencyBalance ? (
+              <div className="flex flex-col">
+                <div
+                  onClick={onMax}
+                  className="text-xs font-medium text-right cursor-pointer text-low-emphesis"
+                >
+                  {`Balance:`} {parseFloat(selectedCurrencyBalance).toFixed(2)}{" "}
+                  {token.symbol}
+                </div>
+                <FiatValue fiatValue={fiat * parseFloat(value)} />
+              </div>
+            ) : null}
           </div>
         </div>
         {/* {!hideInput && (

@@ -42,11 +42,11 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   // console.log("activeChainToFetch", activeChain, aChain);
   return useCallback(async () => {
     try {
-      const result: { tokens: Token[] } =
-        await Moralis.Plugins.oneInch.getSupportedTokens({
-          chain:
-            SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
-        });
+      // const result: { tokens: Token[] } =
+      //   await Moralis.Plugins.oneInch.getSupportedTokens({
+      //     chain:
+      //       SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+      //   });
       const customTokens = [{
         decimals: 18,
         symbol: "LBTC",
@@ -76,6 +76,7 @@ export function useGetAvailableTokens(): (chain?: number) => void {
       const to = Object.values(resultTokens).find(
         (val: any) => val.symbol === "LETH"
       );
+      console.log('currentTrade totototot', to, resultTokens)
       dispatch(
         updateCurrentTrade({
           to: { ...to, isNative: to.symbol === "ETH" },
