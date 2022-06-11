@@ -67,7 +67,6 @@ export function CurrencySearch({
   includeNativeCurrency = true,
   allowManageTokenList = true,
   onChainChange,
-  onTokenChange,
 }: CurrencySearchProps) {
   const [selectedNetwork, setSelectedNetwork] = useState(1);
   const [networkTokens, setNetworkTokens] = useState([]);
@@ -145,16 +144,12 @@ export function CurrencySearch({
     ];
   }, [debouncedQuery, ether, filteredSortedTokens]);
 
-  const handleCurrencySelect = useCallback(
-    (currency: Token) => {
-      onTokenChange && onTokenChange(currency.symbol);
-      onCurrencySelect(currency);
-      setTimeout(() => {
-        onDismiss();
-      }, 100);
-    },
-    [onTokenChange, onCurrencySelect, onDismiss]
-  );
+  const handleCurrencySelect = useCallback((currency: Token) => {
+    onCurrencySelect(currency);
+    setTimeout(() => {
+      onDismiss();
+    }, 100);
+  }, []);
 
   // clear the input on open
   useEffect(() => {

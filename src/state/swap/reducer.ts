@@ -1,6 +1,6 @@
 import { createReducer } from "@reduxjs/toolkit";
 import { ChainId } from "constants/chainIds";
-import { Balance, MoralisError, Token, TokenSelect } from "state/types";
+import { Balance, MoralisError, Token, TokenSelect, ChainSelect } from "state/types";
 import Web3 from "web3";
 import {
   loading,
@@ -11,7 +11,7 @@ import {
   updateCurrentAmount,
   fetchBalances,
   updateCurrentBalances,
-  updateActiveChain,
+  updateActiveChains,
 } from "./action";
 
 interface SwapState {
@@ -26,7 +26,7 @@ interface SwapState {
   currentAmount: TokenSelect;
   balances: Balance[];
   currentBalances: TokenSelect;
-  activeChain: ChainId;
+  activeChains: ChainSelect;
 }
 const initialState: SwapState = {
   loading: false,
@@ -62,7 +62,10 @@ const initialState: SwapState = {
     to: 0,
     from: 0,
   },
-  activeChain: ChainId.MAINNET,
+  activeChains: {
+    toChain: 43113,
+    fromChain: 4
+  },
 };
 
 export default createReducer(initialState, (builder) =>
@@ -91,7 +94,7 @@ export default createReducer(initialState, (builder) =>
     .addCase(updateCurrentBalances, (state, action) => {
       state.currentBalances = action.payload;
     })
-    .addCase(updateActiveChain, (state, action) => {
-      state.activeChain = action.payload;
+    .addCase(updateActiveChains, (state, action) => {
+      state.activeChains = action.payload;
     })
 );

@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { ChainId } from "constants/chainIds";
-import { Balance, MoralisError, Token, TokenSelect } from "state/types";
+import { Balance, MoralisError, Token, TokenSelect, ChainSelect } from "state/types";
 export enum Field {
   INPUT = "from",
   OUTPUT = "to",
@@ -23,6 +23,6 @@ export const fetchBalances = createAction<Balance[]>("swap/fetchBalances");
 export const updateCurrentBalances = createAction<TokenSelect>(
   "swap/updateCurrentBalances"
 );
-export const updateActiveChain = createAction<ChainId>(
-  "swap/updateActiveChain"
+export const updateActiveChains = createAction<ChainSelect>(
+  "swap/updateActiveChains"
 );

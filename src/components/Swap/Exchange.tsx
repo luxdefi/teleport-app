@@ -222,7 +222,6 @@ export default function ExchangePanel({
           otherSelectedCurrency={otherToken}
           showCommonBases={true}
           onChainChange={onChainChange}
-          onTokenChange={onTokenChange}
         />
       )}
     </div>

@@ -15,10 +15,11 @@ import {
   updateCurrentBalances,
   updateCurrentTrade,
   updateError,
-  updateActiveChain,
+  updateActiveChains,
   loading,
 } from "./action";
 import { notify } from "components/alertMessage";
+import { useRouter } from "next/router";
 
 export function useAllTokens(): { [chainId in ChainId]?: Token[] } {
   return useSelector((state: AppState) => state.swap.tokens);
@@ -28,7 +29,6 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   const activeChain: number = useSelector(
     (state: AppState) => state.swap.activeChain
   );
-  const aChain = useSelector((state: AppState) => state.swap);
   const chainAddresses: {
     LBTC: string
     LETH: string;
@@ -42,32 +42,34 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   // console.log("activeChainToFetch", activeChain, aChain);
   return useCallback(async () => {
     try {
-      // const result: { tokens: Token[] } =
-      //   await Moralis.Plugins.oneInch.getSupportedTokens({
-      //     chain:
-      //       SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
-      //   });
-      const customTokens = [{
+      const result: { tokens: Token[] } =
+        await Moralis.Plugins.oneInch.getSupportedTokens({
+          chain:
+            SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+        });
+      const customTokens: Token[] = [{
         decimals: 18,
         symbol: "LBTC",
         address: chainAddresses.LBTC,
         logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
         name: "LuxBTC",
+        isNative: false
       }, {
         decimals: 18,
         symbol: "LETH",
         address: chainAddresses.LETH,
         logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
         name: "LuxETH",
+        isNative: false
       }, {
         decimals: 18,
         symbol: "LUSD",
         address: chainAddresses.LUSD,
         logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
         name: "LuxUSD",
+        isNative: false
       }];
-      const resultTokens = customTokens;
-      // resultTokens[chainAddresses.LUX] = customToken;
+      const resultTokens = [...result.tokens, ...((chainId === 4 || chainId == 43113) ? customTokens : [])];
       dispatch(fetchTokens({ [activeChain]: resultTokens }));
 
       const from = Object.values(resultTokens).find(
@@ -126,10 +128,17 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   // );
 }
 
-export function useUpdateActiveChain(): (chain: ChainId) => void {
+export function useUpdateActiveChains(): (chain: ChainId, side: 'fromChain' | 'toChain') => void {
+  const router = useRouter();
   const dispatch = useDispatch();
+  const aChains = useSelector((state: AppState) => state.swap.activeChains);
   return useCallback(
-    (chain: number) => {
+    (chain: number, side: string) => {
+      console.log('useUpdateActiveChains sidee', side)
+      console.log('useUpdateActiveChains chainnnnn', chain)
+
+      router.query[side] = String(chain);
+      router.push(router);
       // dispatch(updateCurrentTrade({}));
       // dispatch(updateCurrentAmount({}));
       // dispatch(updateCurrentBalances({}));
@@ -137,9 +146,11 @@ export function useUpdateActiveChain(): (chain: ChainId) => void {
       // dispatch(updateError({}));
       // dispatch(loading({}));
       // dispatch(fetchTokens({}));
-      dispatch(updateActiveChain(chain));
+      dispatch(updateActiveChains({
+        ...aChains, [side]: chain
+      }));
     },
-    [dispatch]
+    [dispatch, router, aChains]
   );
 }
 
@@ -150,6 +161,7 @@ export function useFetchUserBalances(): () => void {
   const getCurrentBalances = useGetCurrentBalances();
   return useCallback(async () => {
     try {
+      //GET NONE SUPPORTED CHAIN ID BALANCE (LUX)
       const options: { chain?: any; address: string } = {
         chain: SUPPORTED_NETWORKS[chainId].chainId,
         address: account,

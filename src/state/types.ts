@@ -78,3 +78,8 @@ export interface TokenSelect {
     to: number;
     from: number
 }
+
+export interface ChainSelect {
+    toChain: number;
+    fromChain: number
+}

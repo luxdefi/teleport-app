@@ -33,7 +33,6 @@ function CurrencySearchModal({
   includeNativeCurrency = true,
   allowManageTokenList = true,
   onChainChange,
-  onTokenChange,
 }: CurrencySearchModalProps) {
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [modalView, setModalView] = useState<CurrencyModalView>(
@@ -113,7 +112,6 @@ function CurrencySearchModal({
           includeNativeCurrency={includeNativeCurrency}
           allowManageTokenList={allowManageTokenList}
           onChainChange={onChainChange}
-          onTokenChange={onTokenChange}
         />
       ) : (
         ""

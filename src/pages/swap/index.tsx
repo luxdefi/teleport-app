@@ -8,12 +8,14 @@ import {
   useGetCurrentBalances,
   useGetQuote,
   useSwap,
+  useUpdateActiveChains,
 } from "state/swap/hooks";
 import { AppState } from "state/store";
 import { useAppSelector } from "state/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Field,
+  updateActiveChains,
   updateCurrentAmount,
   updateCurrentSelectSide,
   updateCurrentTrade,
@@ -52,6 +54,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const swapTokens = useSwap();
   const bridgeTokens = useBridge();
   const getQuote = useGetQuote();
+  const updateChains = useUpdateActiveChains();
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false);
   const [TeleportContractBurn, setTeleportContractBurn] = useState<any>();
   const [TeleportContractMint, setTeleportContractMint] = useState<Contract>();
@@ -62,32 +65,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
   // get query
   const query = router.query;
   // console.log("app_query", query?.toChain, query?.fromChain);
-
-  const fromChain = useCallback(
-    (num: number) => {
-      router.query.fromChain = String(num);
-      router.push(router);
-    },
-    [router]
-  );
-
-  const toChain = useCallback(
-    (num: number) => {
-      router.query.toChain = String(num);
-      router.push(router);
-    },
-    [router]
-  );
-
-  const to = (str: string) => {
-    router.query.to = str.toUpperCase();
-    router.push(router);
-  };
-
-  const from = (str: string) => {
-    router.query.from = str.toUpperCase();
-    router.push(router);
-  };
 
   // useEffect(() => {
   //   if (!query.fromChain) {
@@ -105,6 +82,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
     error,
     currentSelectSide,
     balances,
+    activeChains,
   } = useAppSelector((state: AppState) => state.swap);
 
   // useEffect(() => {
@@ -158,12 +136,24 @@ const Swap: React.FC<SwapProps> = ({}) => {
     getQuote(newAmount, side);
   };
   const onSwitchTokens = () => {
+    router.query["fromChain"] = String(activeChains.toChain);
+    router.query["toChain"] = String(activeChains.fromChain);
+    router.query["from"] = String(currentTrade.to.symbol.toUpperCase());
+    router.query["to"] = String(currentTrade.from.symbol.toUpperCase());
+    router.push(router);
     dispatch(
       updateCurrentTrade({
         to: currentTrade.from,
         from: currentTrade.to,
       })
     );
+    dispatch(
+      updateActiveChains({
+        toChain: activeChains.fromChain,
+        fromChain: activeChains.toChain,
+      })
+    );
+
     const newAmount = {
       to: currentAmount.from,
       from: currentAmount.to,
@@ -388,11 +378,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
               bothSelected={
                 currentTrade.from &&
                 currentTrade.to &&
-                !!query?.fromChain &&
-                !!query?.toChain
+                activeChains.fromChain &&
+                activeChains.toChain
               }
-              fromChain={NETWORK_LABEL[Number(query?.fromChain)]}
-              toChain={NETWORK_LABEL[Number(query?.toChain)]}
+              fromChain={NETWORK_LABEL[Number(activeChains?.fromChain)]}
+              toChain={NETWORK_LABEL[Number(activeChains?.toChain)]}
             />
           </div>
           {/* <ConfirmSwapModal
@@ -423,22 +413,23 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   handleChange(currentBalances[Field.INPUT], Field.INPUT)
                 }
                 // fiatValue={fiatValueInput ?? undefined}
-                onCurrencySelect={(token) =>
+                onCurrencySelect={(token) => {
                   dispatch(
                     updateCurrentTrade({
                       ...currentTrade,
                       from: { ...token, isNative: token.symbol === "ETH" },
                     })
-                  )
-                }
+                  );
+                  router.query.from = token.symbol.toUpperCase();
+                  router.push(router);
+                }}
                 otherToken={currentTrade[Field.OUTPUT]}
                 showCommonBases={true}
                 onKeyDownFunc={() =>
                   dispatch(updateCurrentSelectSide(Field.INPUT))
                 }
                 id="swap-currency-input"
-                onChainChange={fromChain}
-                onTokenChange={from}
+                onChainChange={(val) => updateChains(val, "fromChain")}
               />
             </div>
             <div className="relative grid py-3">
@@ -482,22 +473,23 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   handleChange(currentBalances[Field.OUTPUT], Field.OUTPUT)
                 }
                 // fiatValue={fiatValueInput ?? undefined}
-                onCurrencySelect={(token) =>
+                onCurrencySelect={(token) => {
                   dispatch(
                     updateCurrentTrade({
                       ...currentTrade,
                       to: { ...token, isNative: token.symbol === "ETH" },
                     })
-                  )
-                }
+                  );
+                  router.query.to = token.symbol.toUpperCase();
+                  router.push(router);
+                }}
                 otherToken={currentTrade[Field.INPUT]}
                 showCommonBases={true}
                 onKeyDownFunc={() =>
                   dispatch(updateCurrentSelectSide(Field.OUTPUT))
                 }
                 id="swap-currency-output"
-                onChainChange={toChain}
-                onTokenChange={to}
+                onChainChange={(val) => updateChains(val, "toChain")}
               />
             </div>
           </div>
