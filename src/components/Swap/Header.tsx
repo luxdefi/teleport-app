@@ -70,7 +70,7 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({
             passHref
           >
             <a className="flex items-center justify-center font-medium text-center rounded-md text-white text-lg  hover:text-high-emphesis">
-              Cross-Chain Swaps for 15,000+ Assets
+              Completely secure, completely private.
             </a>
           </Link>
         ) : bothSelected && crossChain ? (
@@ -182,7 +182,7 @@ const SlippageModal = ({
       </div>
       <div className="pt-2 pb-3 flex justify-between items-center">
         <div className="flex items-center gap-x-2">
-          <h1 className="text-sm text-white">Use Rubic Optimization</h1>
+          <h1 className="text-sm text-white">Use Optimization</h1>
           <button className="outline-none flex items-center">
             <Image src="/icons/info.svg" alt="" width={20} height={20} />
           </button>

@@ -41,7 +41,7 @@ const Celo = '/images/networks/celo-network.jpg'
 const Palm = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/palm.jpg'
 const Moonriver = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/moonriver.jpg'
 const Hardhat = 'https://raw.githubusercontent.com/nomiclabs/hardhat/master/docs/.vuepress/public/favicon-32x32.png'
-const Lux = 'https://lux.wpkt.cash/LuxLogoLarge.png'
+const Lux = '/icons/lux-triangle.png'
 export const NETWORK_ICON = {
   [ChainId.MAINNET]: Mainnet,
   [ChainId.ROPSTEN]: Ropsten,
