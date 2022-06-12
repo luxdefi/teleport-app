@@ -51,19 +51,19 @@ export function useGetAvailableTokens(): (chain?: number) => void {
         decimals: 18,
         symbol: "LBTC",
         address: chainAddresses.LBTC,
-        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        logoURI: "/icons/lux-triangle.png",
         name: "LuxBTC",
       }, {
         decimals: 18,
         symbol: "LETH",
         address: chainAddresses.LETH,
-        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        logoURI: "/icons/lux-triangle.png",
         name: "LuxETH",
       }, {
         decimals: 18,
         symbol: "LUSD",
         address: chainAddresses.LUSD,
-        logoURI: "https://lux.wpkt.cash/LuxLogoLarge.png",
+        logoURI: "/icons/lux-triangle.png",
         name: "LuxUSD",
       }];
       const resultTokens = customTokens;

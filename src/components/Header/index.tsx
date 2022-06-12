@@ -46,13 +46,13 @@ function AppBar(): JSX.Element {
                   {/* <Image src="/logo.png" alt="Sushi" width="32px" height="32px" /> */}
 
                   <NavLink href="/swap">
-                    <div className="flex items-center pl-2 cursor-pointer logo">
+                    <div className="flex items-center pt-3 pb-3 pl-3 cursor-pointer logo">
                       <Image
-                        src="/lux_logo.svg"
+                        src="/icons/lux-logo.png"
                         className="w-10"
                         alt="Logo"
-                        width={92}
-                        height={50}
+                        width={111}
+                        height={31}
                       />
                     </div>
                   </NavLink>
@@ -310,13 +310,10 @@ const MenuDropdown = ({ isOpen }) => {
           : "scale-100 opacity-100 pointer-events-auto"
       }`}
     >
-      <MenuButton title="Referral Program" icon={<MenuIcon />} />
-      <MenuButton title="Setup Widget" icon={<MenuIcon />} />
-      <MenuButton title="SDK" icon={<MenuIcon />} />
-      <MenuButton title="Fiat on-ramp" icon={<MenuIcon />} />
       <MenuButton title="About" icon={<MenuIcon />} />
+      <MenuButton title="SDK" icon={<MenuIcon />} />
+      <MenuButton title="Referral Program" icon={<MenuIcon />} />
       <MenuButton title="FAQ" icon={<MenuIcon />} />
-      <MenuButton title="Rubic Bridge" icon={<MenuIcon />} />
     </div>
   );
 };

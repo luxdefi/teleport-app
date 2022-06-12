@@ -55,7 +55,7 @@ const TransactionDetail = ({ evmToAddress }) => {
             </div>
             <div className="flex items-center justify-between">
               <p>Protocol fee</p>
-              <p>0.3% ≈ 123.67 USDC</p>
+              <p>0.3% ≈ 0.12367 LUX</p>
             </div>
           </div>
           <div className="flex flex-col p-5 border-b cursor-pointer border-grey-50">
@@ -65,16 +65,16 @@ const TransactionDetail = ({ evmToAddress }) => {
             </div>
             <div className="flex items-center justify-between mb-3.5">
               <p>Price impact in target network</p>
-              <p className="text-red">40.32%</p>
+              <p>0.32%</p>
             </div>
             <div className="flex items-center justify-between">
               <p>Current slippage</p>
-              <p>4%</p>
+              <p>0.01%</p>
             </div>
           </div>
           <div className="flex flex-col p-5 cursor-pointer">
             <div className="flex items-center justify-between">
-              <p>You will receive Polygon tokens at this address</p>
+              <p>You will receive Lux tokens at this address</p>
               <div className="relative flex items-center cursor-pointer">
                 {isCopied && (
                   <h1 className="absolute text-sm font-medium text-green -top-7">

@@ -374,7 +374,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
           <meta
             key="description"
             name="description"
-            content="LUX BRIDGE Multi-chain swap"
+            content="Lux Zero Knowledge Privacy Bridge"
           />
         </Head>
 
