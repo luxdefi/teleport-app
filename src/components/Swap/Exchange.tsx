@@ -195,7 +195,7 @@ export default function ExchangePanel({
               debounceTimeout={2000}
             />
 
-            {!hideBalance && token && selectedCurrencyBalance ? (
+            {!hideBalance && token && balance ? (
               <div className="flex flex-col">
                 <div
                   onClick={onMax}

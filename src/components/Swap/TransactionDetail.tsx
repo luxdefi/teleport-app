@@ -47,7 +47,7 @@ const TransactionDetail = ({ evmToAddress, amount, token, bridgeState }) => {
             <div className="flex items-center justify-between">
               <p>Protocol fee</p>
               <p>
-                1% ≈ {amount * 0.001} {token.symbol}
+                1% ≈ {amount * 0.001} {token?.symbol}
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ const TransactionDetail = ({ evmToAddress, amount, token, bridgeState }) => {
                   : "received"}
               </p>
               <p>
-                {amount - amount * 0.001} {token.symbol}
+                {amount - amount * 0.001} {token?.symbol}
               </p>
             </div>
             <div className="flex items-center justify-between">
