@@ -27,70 +27,70 @@ export function useAllTokens(): { [chainId in ChainId]?: Token[] } {
   return useSelector((state: AppState) => state.swap.tokens);
 }
 export function useGetAvailableTokens(): (chain?: number) => void {
-  const { chainId } = useActiveWeb3React();
   const activeChain: number = useSelector(
     (state: AppState) => state.swap.activeChain
   );
-  const chainAddresses: {
-    LBTC: string
-    LETH: string;
-    LUSD: string
-    TELEPORT: string;
-  } =
-    (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
+
   const dispatch = useDispatch();
   const { Moralis } = useMoralis();
 
   // console.log("activeChainToFetch", activeChain, aChain);
-  return useCallback(async () => {
+  return useCallback(async (chain) => {
     try {
-      const result: { tokens: Token[] } =
+      const chainAddresses: {
+        LBTC: string
+        LETH: string;
+        LUSD: string
+        TELEPORT: string;
+      } =
+        (addresses[chain] as any) || (addresses[ChainId.MAINNET] as any);
+      const result: { tokens: { [address in string]?: Token[] } } =
         await Moralis.Plugins.oneInch.getSupportedTokens({
           chain:
-            SUPPORTED_NETWORKS[activeChain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
+            SUPPORTED_NETWORKS[chain].nativeCurrency.symbol.toLowerCase(), // The blockchain you want to use (eth/bsc/polygon)
         });
-      const customTokens: Token[] = [{
-        decimals: 18,
-        symbol: "LBTC",
-        address: chainAddresses.LBTC,
-        logoURI: "/icons/lux-triangle.png",
-        name: "LuxBTC",
-        isNative: false,
-      }, {
-        decimals: 18,
-        symbol: "LETH",
-        address: chainAddresses.LETH,
-        logoURI: "/icons/lux-triangle.png",
-        name: "LuxETH",
-        isNative: false,
-      }, {
-        decimals: 18,
-        symbol: "LUSD",
-        address: chainAddresses.LUSD,
-        logoURI: "/icons/lux-triangle.png",
-        name: "LuxUSD",
-        isNative: false,
-      }];
-      const resultTokens = [...result.tokens, ...((chainId === 4 || chainId == 43113) ? customTokens : [])];
-      dispatch(fetchTokens({ [activeChain]: resultTokens }));
+      const customTokens: any = {
 
-      const from = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "LBTC"
-      );
-      const to = Object.values(resultTokens).find(
-        (val: any) => val.symbol === "LETH"
-      );
-      console.log('currentTrade totototot', to, resultTokens)
-      dispatch(
-        updateCurrentTrade({
-          to: { ...to, isNative: to.symbol === "ETH" },
-          from: { ...from, isNative: from.symbol === "ETH" },
-        })
-      );
+        [chainAddresses.LBTC]: {
+          decimals: 18,
+          symbol: "LBTC",
+          address: chainAddresses.LBTC,
+          logoURI: "/icons/lux-triangle.png",
+          name: "LuxBTC",
+          isNative: false,
+        }, [chainAddresses.LETH]: {
+          decimals: 18,
+          symbol: "LETH",
+          address: chainAddresses.LETH,
+          logoURI: "/icons/lux-triangle.png",
+          name: "LuxETH",
+          isNative: false,
+        }
+      };
+      const tokens = result.tokens
+      console.log('customtojks', tokens)
+
+      const resultTokens = chain == 43113 ? customTokens : { ...customTokens, ...tokens, };
+      console.log('{ [chain]: resultTokens }', { [chain]: resultTokens })
+      dispatch(fetchTokens({ [chain]: resultTokens }));
+
+      // const from = Object.values(resultTokens).find(
+      //   (val: any) => val.symbol === "LBTC"
+      // );
+      // const to = Object.values(resultTokens).find(
+      //   (val: any) => val.symbol === "LETH"
+      // );
+      // console.log('currentTrade totototot', to, resultTokens)
+      // dispatch(
+      //   updateCurrentTrade({
+      //     to: { ...to, isNative: to.symbol === "ETH" },
+      //     from: { ...from, isNative: from.symbol === "ETH" },
+      //   })
+      // );
     } catch (error) {
       console.log("error in useGetAvailableTokens", error);
     }
-  }, [Moralis.Plugins.oneInch, activeChain, chainAddresses, dispatch]);
+  }, [Moralis.Plugins.oneInch, dispatch]);
   // const supported_networks = SUPPORTED_NETWORKS;
   // const native = NATIVE;
   // console.log("chainId ==>", native, supported_networks);
@@ -223,7 +223,10 @@ export function useGetCurrentBalances(): () => void {
           if (activeChains[trade] !== 4) {
             const lBTCContract = altContract('LBTC', activeChains[trade], account, library)
             console.log('lBTCContract', activeChains[trade], lBTCContract)
-            customChainFunc(lBTCContract, account)
+            if (lBTCContract) {
+              customChainFunc(lBTCContract, account)
+
+            }
           }
           const tradeBalance = balances.find(
             (balance) => balance.symbol === currentTrade[trade].symbol
