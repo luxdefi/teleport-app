@@ -53,13 +53,21 @@ export function useContract(
 export function useLuxContract(): Contract | null {
   return useContract("LUX");
 }
-export function useTeleportContract(): Contract | null {
-  return useContract("TELEPORT");
+export function useTeleportContract(): (chain) => Contract | null {
+  const { account, library } = useActiveWeb3React()
+  return useCallback(
+    (chain) => {
+      console.log('hitting useTeleportContract', chain)
+      return altContract("TELEPORT", chain, account, library);
+    },
+    [],
+  )
 }
 
 export function useLbtcContract(chain?): Contract | null {
 
   return useContract('LBTC', chain) // DYNAMICALLY FETCHES THE RIGHT CONTRACT BASED ON THE CURRENT CHAIN..USERS CAN ONLY BRIDGE FROM AN ACTIVE CHAIN
+
 }
 export const altContract = (nameOrAddress,
   chain,

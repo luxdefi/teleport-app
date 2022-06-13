@@ -264,18 +264,18 @@ const Swap: React.FC<SwapProps> = ({}) => {
     if (fromNetRadio == "43113" && toNetRadio == "4") {
       // && tokenName == "LuxBTC" => check if token is LBTC or LETH
       console.log("from lux to eth chain");
-      setTeleportContractBurn(teleportContract); //set contract burn to teleport lux contract
-      setTeleportContractMint(teleportContract); //set contract mint to teleport eth contract
+      setTeleportContractBurn(teleportContract(43113)); //set contract burn to teleport lux contract
+      setTeleportContractMint(teleportContract(4)); //set contract mint to teleport eth contract
       setFromTeleportAddr(addresses.Teleport_Lux);
     } else if (fromNetRadio == "4" && toNetRadio == "43113") {
       console.log("from eth to lux chain");
 
-      setTeleportContractBurn(teleportContract); //set contract burn to teleport eth contract
-      setTeleportContractMint(teleportContract); //set contract mint to teleport lux contract
+      setTeleportContractBurn(teleportContract(4)); //set contract burn to teleport eth contract
+      setTeleportContractMint(teleportContract(43113)); //set contract mint to teleport lux contract
       setFromTeleportAddr(addresses.Teleport_Eth);
     }
-    console.log("TeleportContractBurn", TeleportContractBurn);
-    console.log("setTeleportContractMint", setTeleportContractMint);
+    console.log("TeleportContract TeleportContractBurn", TeleportContractBurn);
+    console.log("TeleportContract TeleportContractMint", TeleportContractMint);
     console.log("fromTeleportAddr", fromTeleportAddr);
   }
 
@@ -645,7 +645,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     ) : error ? (
                       error.description
                     ) : (
-                      "Swap"
+                      "Switch network"
                     )
                   ) : null
                 ) : (
