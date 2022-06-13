@@ -28,7 +28,10 @@ export interface Token {
     name: string
     symbol: string;
     isNative: boolean;
-
+}
+export interface CurrentTrade {
+    to: Token | {} | null;
+    from: Token | {} | null;
 }
 export interface TokenList {
     readonly name: string;
@@ -80,6 +83,6 @@ export interface TokenSelect {
 }
 
 export interface ChainSelect {
-    toChain: number;
-    fromChain: number
+    to: number;
+    from: number
 }

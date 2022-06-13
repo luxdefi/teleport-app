@@ -10,12 +10,13 @@ import { ChainId } from "constants/chainIds";
 // returns null on errors
 export function useContract(
   nameOrAddress: string | undefined,
+  chain?: string,
   ABI: any = undefined,
   withSignerIfPossible = true,
   useDefault = false
 ): Contract | null {
   const { library, account, chainId } = useActiveWeb3React();
-  let chainIdStr = chainId ? chainId.toString() : "4";
+  let chainIdStr = chain ? chain : chainId ? chainId.toString() : "4";
   console.log('[nameOrAddress.toString()]', nameOrAddress)
   let address: string | undefined = nameOrAddress;
   // const randomWallet = ethers.Wallet.createRandom();
@@ -56,6 +57,39 @@ export function useTeleportContract(): Contract | null {
   return useContract("TELEPORT");
 }
 
-export function useLbtcContract(address): Contract | null {
-  return useContract(address)
+export function useLbtcContract(chain?): Contract | null {
+
+  return useContract('LBTC', chain) // DYNAMICALLY FETCHES THE RIGHT CONTRACT BASED ON THE CURRENT CHAIN..USERS CAN ONLY BRIDGE FROM AN ACTIVE CHAIN
+}
+export const altContract = (nameOrAddress,
+  chain,
+  account, library) => {
+  let chainIdStr = chain ? chain : "4";
+  console.log('useGetCurrentBalances', nameOrAddress, chain)
+  let address: string | undefined = nameOrAddress;
+  let ABI;
+  if (!isAddress(nameOrAddress) || nameOrAddress === AddressZero) {
+    address = addresses[chainIdStr][nameOrAddress.toString()] || "";
+    ABI =
+      ABI || abis[chainIdStr]
+        ? abis[chainIdStr][nameOrAddress.toString()]
+        : null;
+  }
+
+
+  if (!address || !ABI || !library) return null;
+  try {
+    const contract = getContract(
+      address.toString(),
+      ABI,
+      library,
+      account ? account : undefined
+    );
+    console.log('fetching contracrt', contract)
+    return contract;
+  } catch (error) {
+    console.error("Failed to get contract", error);
+    return null;
+  }
+
 }

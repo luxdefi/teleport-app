@@ -42,7 +42,7 @@ function AppBar(): JSX.Element {
           <>
             <div className="px-4 py-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-x-4 relative">
+                <div className="relative flex items-center gap-x-4">
                   {/* <Image src="/logo.png" alt="Sushi" width="32px" height="32px" /> */}
 
                   <NavLink href="/swap">
@@ -56,7 +56,7 @@ function AppBar(): JSX.Element {
                       />
                     </div>
                   </NavLink>
-                  <button className="hidden sm:flex outline-none w-12 h-12 justify-center items-center rounded-full bg-accent bg-opacity-0 transition-colors ease-in-out delay-75 hover:bg-opacity-30 ">
+                  <button className="items-center justify-center hidden w-12 h-12 transition-colors ease-in-out delay-75 bg-opacity-0 rounded-full outline-none sm:flex bg-accent hover:bg-opacity-30 ">
                     <Hamburger
                       size={20}
                       color="#4F46E5"
@@ -75,17 +75,11 @@ function AppBar(): JSX.Element {
                     activeType={activeType}
                     setActiveType={setActiveType}
                   />
-                  <SwitchBtn
-                    title="Earn"
-                    href="/earn"
-                    activeType={activeType}
-                    setActiveType={setActiveType}
-                  />
                 </div>
 
                 <div className="flex items-center gap-x-4">
                   {/* <button className="outline-none border border-accent bg-transparent flex justify-center items-center h-[55px] min-w-[120px] rounded-[60px]">
-                    <h1 className="p-2 text-baseline text-white font-medium md:p-3 whitespace-nowrap">
+                    <h1 className="p-2 font-medium text-white text-baseline md:p-3 whitespace-nowrap">
                       Buy Lux
                     </h1>
                   </button> */}
@@ -217,7 +211,7 @@ function AppBar(): JSX.Element {
 
                 <div className="flex -mr-2 sm:hidden">
                   {/* Mobile menu button */}
-                  <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-accent  focus:outline-none">
+                  <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-accent focus:outline-none">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <svg
@@ -263,7 +257,7 @@ function AppBar(): JSX.Element {
                 <Link href="/swap">
                   <a
                     id={`swap`}
-                    className="p-2 text-baseline text-white hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                    className="p-2 text-white text-baseline hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
                   >
                     SWAP
                   </a>
@@ -292,7 +286,7 @@ const SwitchBtn = ({ href, title, activeType, setActiveType }) => {
       <NavLink href={href || "/swap"}>
         <a
           id={`swap-nav-link`}
-          className="p-2 text-baseline text-white font-medium hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+          className="p-2 font-medium text-white text-baseline hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
         >
           {title}
         </a>
@@ -325,9 +319,9 @@ interface MenuButtonProps {
 
 const MenuButton = ({ title, icon }: MenuButtonProps) => {
   return (
-    <div className="cursor-pointer flex items-center gap-x-4">
+    <div className="flex items-center cursor-pointer gap-x-4">
       {icon || <MenuIcon />}
-      <h1 className="text-sm text-white font-bold whitespace-nowrap">
+      <h1 className="text-sm font-bold text-white whitespace-nowrap">
         {title}
       </h1>
     </div>

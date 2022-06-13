@@ -1,6 +1,6 @@
 import { createReducer } from "@reduxjs/toolkit";
 import { ChainId } from "constants/chainIds";
-import { Balance, MoralisError, Token, TokenSelect, ChainSelect } from "state/types";
+import { Balance, MoralisError, Token, TokenSelect, ChainSelect, CurrentTrade } from "state/types";
 import Web3 from "web3";
 import {
   loading,
@@ -17,10 +17,7 @@ import {
 interface SwapState {
   loading: boolean;
   tokens: { [chainId in ChainId]?: Token[] };
-  currentTrade: null | {
-    to: Token | {} | null;
-    from: Token | {} | null;
-  };
+  currentTrade: null | CurrentTrade;
   error: MoralisError | null;
   currentSelectSide: "from" | "to";
   currentAmount: TokenSelect;
@@ -63,8 +60,8 @@ const initialState: SwapState = {
     from: 0,
   },
   activeChains: {
-    toChain: 43113,
-    fromChain: 4
+    to: 43113,
+    from: 4
   },
 };
 

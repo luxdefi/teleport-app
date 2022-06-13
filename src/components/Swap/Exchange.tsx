@@ -13,6 +13,11 @@ import { ChevronDownIcon } from "@heroicons/react/outline";
 import { useGetTokenFiatValue } from "state/swap/hooks";
 import CurrencySearchModal from "modals/SearchModal/CurrencySearchModal";
 import Image from "next/image";
+import Web3 from "web3";
+import useActiveWeb3React from "hooks/useActiveWeb3React";
+import { useLbtcContract } from "hooks/useContract";
+import { SUPPORTED_NETWORKS } from "config/networks";
+import { useMoralisWeb3Api } from "react-moralis";
 
 interface ExchangePanelProps {
   value?: string;
@@ -59,6 +64,10 @@ export default function ExchangePanel({
   onTokenChange,
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const lBTCContract = useLbtcContract();
+  const Web3Api = useMoralisWeb3Api();
+
+  const { account, chainId } = useActiveWeb3React();
   const handleDismissSearch = useCallback(() => {
     setTimeout(() => {
       setModalOpen(false);
@@ -82,6 +91,19 @@ export default function ExchangePanel({
   useEffect(() => {
     initFetch();
   }, [initFetch, token]);
+  // const clickMe = async () => {
+  //   const usrBalance = Web3.utils.fromWei(
+  //     (await lBTCContract.balanceOf(account)).toString(),
+  //     "ether"
+  //   );
+  //   console.log("usrBalance", usrBalance);
+  //   const options: { chain?: any; address: string } = {
+  //     chain: SUPPORTED_NETWORKS[chainId].chainId,
+  //     address: account,
+  //   };
+  //   const balanc = await Web3Api.account.getTokenBalances(options);
+  //   console.log("balanc", balanc);
+  // };
   const onKeyDown = function (e) {
     var key = e.keyCode ?? e.which;
 

@@ -91,7 +91,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   const initMoralis = useCallback(() => {
     async () => {
-      console.log("chainId", chainId);
+      console.log("initMoralis chainId", chainId);
       if (chainId) {
         try {
           await Moralis.initPlugins();
@@ -107,8 +107,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
   }, [Moralis, chainId, fetchUserBalances, getAvailableTokens]);
 
   useEffect(() => {
+    console.log("initMoralis chainId", chainId);
+
     initMoralis();
-  }, [chainId, initMoralis]);
+  }, [chainId]);
 
   useEffect(() => {
     if (currentTrade) {
@@ -136,8 +138,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
     getQuote(newAmount, side);
   };
   const onSwitchTokens = () => {
-    router.query["fromChain"] = String(activeChains.toChain);
-    router.query["toChain"] = String(activeChains.fromChain);
+    router.query["fromChain"] = String(activeChains.to);
+    router.query["toChain"] = String(activeChains.from);
     router.query["from"] = String(currentTrade.to.symbol.toUpperCase());
     router.query["to"] = String(currentTrade.from.symbol.toUpperCase());
     router.push(router);
@@ -149,8 +151,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
     );
     dispatch(
       updateActiveChains({
-        toChain: activeChains.fromChain,
-        fromChain: activeChains.toChain,
+        to: activeChains.from,
+        from: activeChains.to,
       })
     );
 
@@ -162,9 +164,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   };
 
   //BRIDGE FUNCTIONS
-  const lBTCContract = useLbtcContract(
-    "0x526903Ee6118de6737D11b37f82fC7f69B13685D" //NOTE Make this dynamic
-  );
+  const lBTCContract = useLbtcContract();
 
   async function checkBalanceInput(value) {
     const usrBalance = Web3.utils.fromWei(
@@ -356,6 +356,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
+  console.log("currentBalances", currentBalances);
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
@@ -618,17 +619,17 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   } else handleInput();
                 }}
                 id="swap-button"
-                disabled={
-                  (chainId === Number(query?.fromChain ?? 1) &&
-                    ((query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
-                    query?.to &&
-                    query?.from &&
-                    query?.to === query?.from
-                      ? true
-                      : false)) ||
-                  error ||
-                  ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
-                }
+                // disabled={
+                //   (chainId === Number(query?.fromChain ?? 1) &&
+                //     ((query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
+                //     query?.to &&
+                //     query?.from &&
+                //     query?.to === query?.from
+                //       ? true
+                //       : false)) ||
+                //   error ||
+                //   ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
+                // }
               >
                 {loading ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
@@ -647,7 +648,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
                       "Swap"
                     )
                   ) : null
-                ) : null}
+                ) : (
+                  "Bridge"
+                )}
               </button>
             )}
           </div>

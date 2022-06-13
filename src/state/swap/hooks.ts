@@ -20,6 +20,8 @@ import {
 } from "./action";
 import { notify } from "components/alertMessage";
 import { useRouter } from "next/router";
+import { altContract } from "hooks/useContract";
+import Web3 from "web3";
 
 export function useAllTokens(): { [chainId in ChainId]?: Token[] } {
   return useSelector((state: AppState) => state.swap.tokens);
@@ -53,21 +55,21 @@ export function useGetAvailableTokens(): (chain?: number) => void {
         address: chainAddresses.LBTC,
         logoURI: "/icons/lux-triangle.png",
         name: "LuxBTC",
-        isNative: false
+        isNative: false,
       }, {
         decimals: 18,
         symbol: "LETH",
         address: chainAddresses.LETH,
         logoURI: "/icons/lux-triangle.png",
         name: "LuxETH",
-        isNative: false
+        isNative: false,
       }, {
         decimals: 18,
         symbol: "LUSD",
         address: chainAddresses.LUSD,
         logoURI: "/icons/lux-triangle.png",
         name: "LuxUSD",
-        isNative: false
+        isNative: false,
       }];
       const resultTokens = [...result.tokens, ...((chainId === 4 || chainId == 43113) ? customTokens : [])];
       dispatch(fetchTokens({ [activeChain]: resultTokens }));
@@ -155,6 +157,8 @@ export function useUpdateActiveChains(): (chain: ChainId, side: 'fromChain' | 't
 }
 
 export function useFetchUserBalances(): () => void {
+  console.log("initMoralis chainId useFetchUserBalances");
+
   const { chainId, account } = useActiveWeb3React();
   const dispatch = useDispatch();
   const Web3Api = useMoralisWeb3Api();
@@ -169,7 +173,7 @@ export function useFetchUserBalances(): () => void {
       const nativeBalance = await Web3Api.account.getNativeBalance(options);
       console.log("nativebalance", nativeBalance);
       const balanc = await Web3Api.account.getTokenBalances(options);
-      console.log("balanc", balanc);
+      console.log("balanc useFetchUserBalances", balanc);
 
       const newbalances = [
         ...balanc,
@@ -195,8 +199,9 @@ export function useFetchUserBalances(): () => void {
 export function useGetCurrentBalances(): () => void {
   const dispatch = useDispatch();
 
-  const { balances, currentTrade } = useAppSelector((state) => state.swap);
+  const { currentTrade, balances, activeChains } = useAppSelector((state) => state.swap);
   const { Moralis } = useMoralis();
+  const { account, library } = useActiveWeb3React()
   // const getQuote = useGetQuote();
 
   console.log("useGetCurrentBalances", currentTrade);
@@ -215,6 +220,11 @@ export function useGetCurrentBalances(): () => void {
         );
 
         Object.keys(currentTrade).forEach((trade) => {
+          if (activeChains[trade] !== 4) {
+            const lBTCContract = altContract('LBTC', activeChains[trade], account, library)
+            console.log('lBTCContract', activeChains[trade], lBTCContract)
+            customChainFunc(lBTCContract, account)
+          }
           const tradeBalance = balances.find(
             (balance) => balance.symbol === currentTrade[trade].symbol
           );
@@ -232,7 +242,25 @@ export function useGetCurrentBalances(): () => void {
     }
   }, [dispatch, currentTrade, balances]);
 }
+const customChainFunc = async (lBTCContract, account) => {
 
+  const value = await Web3.utils.fromWei(
+    (await lBTCContract.balanceOf(account)).toString(),
+    "ether"
+  );
+  console.log('value of balance', value)
+}
+// Object.keys(currentTrade).forEach(async (trade) => {
+
+//   const lBTCContract = altContract('LBTC', activeChains[trade], account, library)
+//   console.log('useGetCurrentBalances, lBTCContract', lBTCContract)
+//   const tradeBalance = await Web3.utils.fromWei(
+//     (await lBTCContract.balanceOf(account)).toString(),
+//     "ether"
+//   );
+//   console.log('useGetCurrentBalances', tradeBalance)
+//   tokenBalances[trade] = tradeBalance
+// });
 export function useGetQuote(): (
   currentAmount: TokenSelect,
   side?: "from" | "to"
