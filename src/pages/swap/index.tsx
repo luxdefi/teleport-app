@@ -37,7 +37,11 @@ import {
   SUPPORTED_NETWORKS,
 } from "config/networks";
 import ListCard from "components/Swap/ListCard";
-import { useLbtcContract, useTeleportContract } from "hooks/useContract";
+import {
+  altContract,
+  useLbtcContract,
+  useTeleportContract,
+} from "hooks/useContract";
 import { Contract } from "ethers";
 import addresses from "constants/addresses";
 import Web3 from "web3";
@@ -273,16 +277,16 @@ const Swap: React.FC<SwapProps> = ({}) => {
       if (fromNetRadio == "43113" && toNetRadio == "4") {
         // && tokenName == "LuxBTC" => check if token is LBTC or LETH
         console.log("from lux to eth chain");
-
-        setTeleportContractBurn(teleportContract(43113)); //set contract burn to teleport lux contract
-        setTeleportContractMint(teleportContract(4)); //set contract mint to teleport eth contract
+        setTeleportContractBurn(
+          altContract("TELEPORT", 43113, account, library)
+        ); //set contract burn to teleport lux contract
+        setTeleportContractMint(altContract("TELEPORT", 4, account, library)); //set contract mint to teleport eth contract
         setFromTeleportAddr(addresses.Teleport_Lux);
       } else if (fromNetRadio == "4" && toNetRadio == "43113") {
-        console.log("burnContract from eth to lux chain");
-        const burnContract = teleportContract(4);
-        console.log("burnContract", burnContract);
-        setTeleportContractBurn(teleportContract(4)); //set contract burn to teleport eth contract
-        setTeleportContractMint(teleportContract(43113)); //set contract mint to teleport lux contract
+        setTeleportContractBurn(altContract("TELEPORT", 4, account, library)); //set contract burn to teleport eth contract
+        setTeleportContractMint(
+          altContract("TELEPORT", 43113, account, library)
+        ); //set contract mint to teleport lux contract
         setFromTeleportAddr(addresses.Teleport_Eth);
       }
     } catch (error) {
@@ -395,8 +399,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
         console.log("key exists");
       }
     } catch (err) {
-      console.log("completeTransaction Transaction Failure.", err);
-      setBridgeState({ ...bridgeState, status: "FAILED" });
+      console.log("completeTransaction Transaction Failure. 1", err);
+      // setBridgeState({ ...bridgeState, status: "FAILED" });
       return;
     }
     console.log("completeTransaction 3", signature, hashedTxId, status);
@@ -786,12 +790,12 @@ const Swap: React.FC<SwapProps> = ({}) => {
                       Continue
                     </div>
                   </div>
+                ) : bridgeState?.status === "TRANSFERING" ? (
+                  "Transfering"
                 ) : chainId !== activeChains?.from ? (
                   `switch to ${
                     NETWORK_LABEL[Number(activeChains?.from) || 1]
                   } network`
-                ) : bridgeState?.status === "TRANSFERING" ? (
-                  "Transfering"
                 ) : (
                   "Bridge"
                 )}

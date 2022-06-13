@@ -66,6 +66,7 @@ export function useTeleportContract(): (chain) => Contract | null {
     },
     [dispatch],
   )
+
 }
 
 export function useLbtcContract(chain?): Contract | null {
