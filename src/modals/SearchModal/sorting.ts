@@ -24,8 +24,8 @@ function getTokenComparator(balances: Balance[]): (tokenA: Token, tokenB: Token)
     // 1 = b is first
 
     // sort by balances
-    const balanceA = balances.find(bal => bal.token_address === tokenA.address)?.balance || '0'
-    const balanceB = balances.find(bal => bal.token_address === tokenB.address)?.balance || '0'
+    const balanceA = balances.find(bal => bal.symbol === tokenA.symbol)?.balance || '0'
+    const balanceB = balances.find(bal => bal.symbol === tokenB.symbol)?.balance || '0'
     console.log('balanceA', balanceA, balanceB)
     const balanceComp = balanceComparator(parseFloat(balanceA), parseFloat(balanceB))
     if (balanceComp !== 0) return balanceComp
