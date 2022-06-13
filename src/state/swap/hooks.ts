@@ -7,7 +7,7 @@ import { useMoralis, useMoralisWeb3Api } from "react-moralis";
 import { useDispatch, useSelector } from "react-redux";
 import { useAppSelector } from "state/hooks";
 import { AppState, useAppDispatch } from "state/store";
-import { Token, TokenSelect } from "state/types";
+import { Balance, Token, TokenSelect } from "state/types";
 import {
   fetchBalances,
   fetchTokens,
@@ -130,7 +130,7 @@ export function useGetAvailableTokens(): (chain?: number) => void {
   // );
 }
 
-export function useUpdateActiveChains(): (chain: ChainId, side: 'fromChain' | 'toChain') => void {
+export function useUpdateActiveChains(): (chain: ChainId, side: 'from' | 'to') => void {
   const router = useRouter();
   const dispatch = useDispatch();
   const aChains = useSelector((state: AppState) => state.swap.activeChains);
@@ -138,8 +138,8 @@ export function useUpdateActiveChains(): (chain: ChainId, side: 'fromChain' | 't
     (chain: number, side: string) => {
       console.log('useUpdateActiveChains sidee', side)
       console.log('useUpdateActiveChains chainnnnn', chain)
-
-      router.query[side] = String(chain);
+      const chainSide = side === 'to' ? 'toChain' : 'fromChain'
+      router.query[chainSide] = String(chain);
       router.push(router);
       // dispatch(updateCurrentTrade({}));
       // dispatch(updateCurrentAmount({}));
@@ -163,33 +163,62 @@ export function useFetchUserBalances(): () => void {
   const dispatch = useDispatch();
   const Web3Api = useMoralisWeb3Api();
   const getCurrentBalances = useGetCurrentBalances();
+  const { activeChains } = useAppSelector((state) => state.swap);
+
   return useCallback(async () => {
     try {
-      //GET NONE SUPPORTED CHAIN ID BALANCE (LUX)
-      const options: { chain?: any; address: string } = {
-        chain: SUPPORTED_NETWORKS[chainId].chainId,
-        address: account,
-      };
-      const nativeBalance = await Web3Api.account.getNativeBalance(options);
-      console.log("nativebalance", nativeBalance);
-      const balanc = await Web3Api.account.getTokenBalances(options);
-      console.log("balanc useFetchUserBalances", balanc);
+      let balances: { [chain in ChainId]?: Balance[] } = {};
+      // await Object.values(activeChains).forEach(async (chain: number, index) => {
+      //   console.log('useFetchUserBalances chain', chain)
+      //   //GET NONE SUPPORTED CHAIN ID BALANCE (LUX)
+      //   const options: { chain?: any; address: string } = {
+      //     chain: SUPPORTED_NETWORKS[chain].chainId,
+      //     address: account,
+      //   };
+      //   const nativeBalance = await Web3Api.account.getNativeBalance(options);
+      //   const balanc = await Web3Api.account.getTokenBalances(options);
 
-      const newbalances = [
-        ...balanc,
-        {
-          token_address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          name: "Ethereum",
-          symbol: "ETH",
-          logo: "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
-          thumbnail: "",
-          decimals: "18",
-          balance: nativeBalance.balance,
-        },
-      ];
-      console.log("newbalances newbalances", newbalances);
-      dispatch(fetchBalances(newbalances));
-      getCurrentBalances();
+      //   const newbalances = [
+      //     ...balanc,
+      //     {
+      //       name: SUPPORTED_NETWORKS[chain].chainName,
+      //       symbol: SUPPORTED_NETWORKS[chain].nativeCurrency.symbol,
+      //       decimals: SUPPORTED_NETWORKS[chain].nativeCurrency.decimals,
+      //       balance: nativeBalance.balance
+      //     }
+      //   ];
+      //   balances = { ...balances, [chain]: newbalances }
+      //   console.log("balanceeee useFetchUserBalances", balances);
+
+      // })
+
+      for (const chain of Object.values(activeChains)) {
+        console.log('useFetchUserBalances chain', chain)
+        //GET NONE SUPPORTED CHAIN ID BALANCE (LUX)
+        const options: { chain?: any; address: string } = {
+          chain: SUPPORTED_NETWORKS[chain as string].chainId,
+          address: account,
+        };
+        const nativeBalance = await Web3Api.account.getNativeBalance(options);
+        const balanc = await Web3Api.account.getTokenBalances(options);
+
+        const newbalances = [
+          ...balanc,
+          {
+            name: SUPPORTED_NETWORKS[chain as number].chainName,
+            symbol: SUPPORTED_NETWORKS[chain as number].nativeCurrency.symbol,
+            decimals: SUPPORTED_NETWORKS[chain as number].nativeCurrency.decimals,
+            balance: nativeBalance.balance
+          }
+        ];
+        balances = { ...balances, [chain as number]: newbalances }
+        console.log("balanceeee useFetchUserBalances", balances);
+
+      }
+
+      console.log("balanceeee  newbalances newbalances", balances);
+      dispatch(fetchBalances(balances));
+      // getCurrentBalances();
     } catch (error) {
       console.log("error in useFetchUserBalances", error);
     }
@@ -252,6 +281,7 @@ const customChainFunc = async (lBTCContract, account) => {
     "ether"
   );
   console.log('lBTCContract value of balance', value)
+  return value;
 }
 // Object.keys(currentTrade).forEach(async (trade) => {
 

@@ -19,7 +19,7 @@ export const updateCurrentSelectSide = createAction<"from" | "to">(
 export const updateCurrentAmount = createAction<TokenSelect>(
   "swap/updateCurrentAmount"
 );
-export const fetchBalances = createAction<Balance[]>("swap/fetchBalances");
+export const fetchBalances = createAction<{ [chain in ChainId]?: Balance[] }>("swap/fetchBalances");
 export const updateCurrentBalances = createAction<TokenSelect>(
   "swap/updateCurrentBalances"
 );

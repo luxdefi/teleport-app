@@ -21,7 +21,7 @@ interface SwapState {
   error: MoralisError | null;
   currentSelectSide: "from" | "to";
   currentAmount: TokenSelect;
-  balances: Balance[];
+  balances: { [chain in ChainId]?: Balance[] };
   currentBalances: TokenSelect;
   activeChains: ChainSelect;
 }
@@ -54,7 +54,7 @@ const initialState: SwapState = {
     to: 0,
     from: 0.1,
   },
-  balances: [],
+  balances: {},
   currentBalances: {
     to: 0,
     from: 0,

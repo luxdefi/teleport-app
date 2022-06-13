@@ -42,6 +42,8 @@ import { Contract } from "ethers";
 import addresses from "constants/addresses";
 import Web3 from "web3";
 import { isAddress } from "functions/validate";
+import { switchChain } from "functions/contract";
+import { RedoRounded } from "@mui/icons-material";
 
 interface SwapProps {}
 
@@ -61,10 +63,31 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const updateChains = useUpdateActiveChains();
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false);
   const [TeleportContractBurn, setTeleportContractBurn] = useState<any>();
-  const [TeleportContractMint, setTeleportContractMint] = useState<Contract>();
+  const [TeleportContractMint, setTeleportContractMint] = useState<any>();
   const [fromTeleportAddr, setFromTeleportAddr] = useState("");
   const [evmToAddress, setEvmToAddress] = useState("");
-
+  const [bridgeState, setBridgeState] = useState<{
+    toTargetAddrHash?: string;
+    toTokenAddrHash?: string;
+    toNetIdHash?: string;
+    signature?: string;
+    hashedTxId?: string;
+    transferTxHash?: string;
+    tokenAddrHash?: string;
+    vault?: string;
+    networkType?: string;
+    status:
+      | "IDLE"
+      | "PROCESSING"
+      | "BURNED"
+      | "MINTED"
+      | "TRANSFERING"
+      | "SUCCESS"
+      | "FAILED";
+    text?: string;
+  }>({
+    status: "IDLE",
+  });
   const router = useRouter();
   // get query
   const query = router.query;
@@ -167,6 +190,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   //BRIDGE FUNCTIONS
   async function handleInput() {
+    setBridgeState({ ...bridgeState, status: "PROCESSING" });
     await setNets();
     const msgSig = await library
       ?.getSigner()
@@ -189,7 +213,15 @@ const Swap: React.FC<SwapProps> = ({}) => {
         console.log("Amount:", amount.toString());
 
         if (cnt == 0) {
-          handleMint(amount, cnt, query?.fromChain, query?.toChain, tx, msgSig);
+          setBridgeState({ ...bridgeState, status: "BURNED" });
+          handleMint(
+            amount,
+            cnt,
+            activeChains?.from,
+            activeChains?.to,
+            tx,
+            msgSig
+          );
           cnt++;
         }
       });
@@ -205,7 +237,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         console.log("Receipt received");
         TeleportContractBurn.off("BridgeBurned");
         TeleportContractBurn.removeAllListeners(["BridgeBurned"]);
-
+        setBridgeState({ ...bridgeState, status: "BURNED" });
         if (cnt == 0) {
           console.log(
             "cookie array:",
@@ -217,8 +249,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
           await handleMint(
             amt,
             cnt,
-            query?.fromChain,
-            query?.toChain,
+            activeChains?.from,
+            activeChains?.to,
             tx,
             msgSig
           );
@@ -230,29 +262,41 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
-  function setNets() {
+
+  async function setNets() {
     console.log("currentTrade", currentTrade);
     console.log("teleportContract", teleportContract);
-    const fromNetRadio = query?.fromChain;
-    const toNetRadio = query?.toChain;
+    const fromNetRadio = activeChains?.from;
+    const toNetRadio = activeChains?.to;
     console.log("chains", fromNetRadio, toNetRadio);
-    if (fromNetRadio == "43113" && toNetRadio == "4") {
-      // && tokenName == "LuxBTC" => check if token is LBTC or LETH
-      console.log("from lux to eth chain");
-      setTeleportContractBurn(teleportContract(43113)); //set contract burn to teleport lux contract
-      setTeleportContractMint(teleportContract(4)); //set contract mint to teleport eth contract
-      setFromTeleportAddr(addresses.Teleport_Lux);
-    } else if (fromNetRadio == "4" && toNetRadio == "43113") {
-      console.log("from eth to lux chain");
+    try {
+      if (fromNetRadio == "43113" && toNetRadio == "4") {
+        // && tokenName == "LuxBTC" => check if token is LBTC or LETH
+        console.log("from lux to eth chain");
 
-      setTeleportContractBurn(teleportContract(4)); //set contract burn to teleport eth contract
-      setTeleportContractMint(teleportContract(43113)); //set contract mint to teleport lux contract
-      setFromTeleportAddr(addresses.Teleport_Eth);
+        setTeleportContractBurn(teleportContract(43113)); //set contract burn to teleport lux contract
+        setTeleportContractMint(teleportContract(4)); //set contract mint to teleport eth contract
+        setFromTeleportAddr(addresses.Teleport_Lux);
+      } else if (fromNetRadio == "4" && toNetRadio == "43113") {
+        console.log("burnContract from eth to lux chain");
+        const burnContract = teleportContract(4);
+        console.log("burnContract", burnContract);
+        setTeleportContractBurn(teleportContract(4)); //set contract burn to teleport eth contract
+        setTeleportContractMint(teleportContract(43113)); //set contract mint to teleport lux contract
+        setFromTeleportAddr(addresses.Teleport_Eth);
+      }
+    } catch (error) {
+      setBridgeState({ ...bridgeState, status: "FAILED" });
+      setTimeout(() => {
+        setBridgeState({ ...bridgeState, status: "IDLE" });
+      }, 2000);
     }
+
     console.log("TeleportContract TeleportContractBurn", TeleportContractBurn);
     console.log("TeleportContract TeleportContractMint", TeleportContractMint);
     console.log("fromTeleportAddr", fromTeleportAddr);
   }
+
   //async function handleMint(amount, cnt, fromNetId, toNetId, receipt, tx){
   async function handleMint(amount, cnt, fromNetId, toNetId, tx, msgSig) {
     const amtNoWei = Web3.utils.fromWei(amount.toString());
@@ -261,22 +305,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
     console.log("txid:", txid);
 
     if (Number(amtNoWei) > 0 && cnt == 0) {
-      console.log("bridge received coins with transaction has", txid);
-
       const toNetIdHash = Web3.utils.keccak256(toNetId.toString());
       const toTargetAddrHash = Web3.utils.keccak256(evmToAddress); //Web3.utils.keccak256(evmToAddress.slice(2));
       const toTokenAddrHash = Web3.utils.keccak256(
         currentTrade[Field.OUTPUT].address
       ); //Web3.utils.keccak256(toTokenAddress.slice(2));
-      console.log(
-        "toTargetAddrHash",
-        toTargetAddrHash,
-        "toNetIdHash",
-        toNetIdHash,
-        "toTokenAddrHash",
-        toTokenAddrHash
-      );
-      //var cmd = "http://localhost:5000/api/v1/getsig/txid/"+txid+"/fromNetId/"+fromNetId+"/toNetIdHash/"+toNetIdHash+"/tokenName/"+tokenName+"/tokenAddrHash/"+toTokenAddrHash+"/msgSig/"+msgSig+"/toTargetAddrHash/"+toTargetAddrHash;
       const cmd =
         "https://teleporter.wpkt.cash/api/v1/getsig/txid/" +
         txid +
@@ -303,6 +336,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
           if (result.signature && result.hashedTxId) {
             // Set globals
             console.log("result here", result);
+            setBridgeState({ ...bridgeState, ...result, status: "MINTED" });
           } else if (Number(result.output) === -1) {
             console.log("Duplicate transaction.");
             return;
@@ -330,7 +364,182 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
-  console.log("evmToAddress", evmToAddress);
+
+  //Complete transaction after minting
+  async function completeTransaction() {
+    console.log("CompleteTransaction - switching to:", activeChains);
+    const { signature, hashedTxId, status } = bridgeState;
+    await setNets();
+    if (chainId !== activeChains?.to) {
+      await switchChain(activeChains?.to, library, account);
+    }
+    console.log("completeTransaction 1", TeleportContractMint);
+    try {
+      if (!TeleportContractMint) {
+        console.log(
+          " completeTransaction TeleportContractMintError:",
+          TeleportContractMint
+        );
+        throw new Error(" completeTransaction Bad contract mint object.");
+      }
+      console.log("completeTransaction 2");
+
+      // Check if key exists to know if transaction was already completed.
+      const keyExists = await TeleportContractMint.keyExistsTx(
+        bridgeState?.signature
+      );
+
+      console.log("keyExists", keyExists);
+
+      if (keyExists) {
+        console.log("key exists");
+      }
+    } catch (err) {
+      console.log("completeTransaction Transaction Failure.", err);
+      setBridgeState({ ...bridgeState, status: "FAILED" });
+      return;
+    }
+    console.log("completeTransaction 3", signature, hashedTxId, status);
+
+    if (signature && hashedTxId && status !== "SUCCESS") {
+      setBridgeState({ ...bridgeState, status: "TRANSFERING" });
+      console.log("completeTransaction 4", bridgeState);
+
+      try {
+        const toNetIdHash = Web3.utils.keccak256(activeChains?.to.toString());
+        const toTargetAddrHash = Web3.utils.keccak256(evmToAddress); //Web3.utils.keccak256(evmToAddress.slice(2));
+        console.log(
+          "completeTransaction 5",
+          "toTargetAddrHash",
+          toTargetAddrHash,
+          "toNetIdHash",
+          toNetIdHash,
+          "currentAmount[Field.INPUT]",
+          Web3.utils.toWei(currentAmount[Field.INPUT]),
+          "hashedTxId",
+          hashedTxId,
+          "signature",
+          signature,
+          " currentTrade[Field.OUTPUT].address",
+          currentTrade[Field.OUTPUT].address,
+          "activeChains?.to",
+          activeChains?.to
+        );
+
+        const tx = await TeleportContractMint.bridgeMintStealth(
+          Web3.utils.toWei(currentAmount[Field.INPUT]),
+          hashedTxId.toString(),
+          evmToAddress.toString(),
+          signature,
+          currentTrade[Field.OUTPUT].address.toString(),
+          activeChains?.to.toString(),
+          "false"
+        );
+        console.log("completeTransaction 6 TX: in TeleportContractMint", tx);
+
+        const receipt = await tx.wait();
+
+        setBridgeState({
+          ...bridgeState,
+          text: `Pending Transaction ID:${tx.hash} Please wait for on-chain confirmation...`,
+        });
+
+        TeleportContractMint.once(
+          "BridgeMinted",
+          async (recip, tokenAddr, amount) => {
+            let feesNoWei = 0;
+            console.log("Recipient:", recip);
+            console.log("Amount:", amount.toString());
+            const amtNoWei = Web3.utils.fromWei(amount.toString());
+            const initialAmt = Web3.utils.fromWei(
+              currentAmount[Field.OUTPUT].toString()
+            );
+            console.log("amtNoWei", amtNoWei, initialAmt);
+            if (Number(amtNoWei) > 0) {
+              const fees = Number(initialAmt) - Number(amtNoWei);
+              feesNoWei = parseFloat(fees.toFixed(10));
+            }
+
+            console.log(
+              "Amount:",
+              amtNoWei,
+              "Fees:",
+              feesNoWei,
+              "Token Address:",
+              tokenAddr
+            );
+
+            if (Number(amtNoWei) > 0) {
+              if (receipt !== undefined) {
+                setBridgeState({
+                  ...bridgeState,
+                  transferTxHash: receipt.transactionHash,
+                  text: `Your transaction hash is ${receipt.transactionHash}`,
+                });
+              }
+
+              setBridgeState({
+                ...bridgeState,
+                status: "SUCCESS",
+                text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
+              });
+              return;
+            } else {
+              setBridgeState({
+                ...bridgeState,
+                status: "FAILED",
+                text: `Transaction Failure: >Bad transaction. Check your sender / recipient address pair or transaction hash. `,
+              });
+              return;
+            }
+          }
+        );
+
+        console.log("Receipt:", receipt, receipt.status === 1);
+
+        if (receipt.status !== 1) {
+          console.log("Transaction Failure.");
+          setBridgeState({
+            ...bridgeState,
+            status: "FAILED",
+            text: `Transaction Failure: possible you have already claimed this transaction.`,
+          });
+          return;
+        } else {
+          console.log("Receipt received");
+          if (bridgeState.status !== "SUCCESS") {
+            setBridgeState({
+              ...bridgeState,
+              status: "SUCCESS",
+              text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
+            });
+          }
+
+          TeleportContractMint.removeAllListeners(["BridgeMinted"]);
+        }
+      } catch (err) {
+        console.log("Error:", err);
+        setBridgeState({
+          ...bridgeState,
+          status: "FAILED",
+          text: `Transaction Failure: ${err.message}`,
+        });
+        return;
+      }
+    } else {
+      setBridgeState({
+        ...bridgeState,
+        status: "FAILED",
+        text: "Transaction Failure: Can not retrieve data from bridge servers.",
+      });
+      return;
+    }
+  }
+  console.log(
+    "balances[activeChains?.from][Field.INPUT]",
+    currentTrade,
+    balances[activeChains?.from]
+  );
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
@@ -349,15 +558,15 @@ const Swap: React.FC<SwapProps> = ({}) => {
             <SwapHeader
               input={currentTrade[Field.INPUT]}
               output={currentTrade[Field.OUTPUT]}
-              crossChain={query?.fromChain !== query?.toChain}
+              crossChain={activeChains?.from !== activeChains?.toChain}
               bothSelected={
                 currentTrade.from &&
                 currentTrade.to &&
-                activeChains.fromChain &&
-                activeChains.toChain
+                activeChains.from &&
+                activeChains.to
               }
-              fromChain={NETWORK_LABEL[Number(activeChains?.fromChain)]}
-              toChain={NETWORK_LABEL[Number(activeChains?.toChain)]}
+              fromChain={NETWORK_LABEL[Number(activeChains?.from)]}
+              toChain={NETWORK_LABEL[Number(activeChains?.to)]}
             />
           </div>
           {/* <ConfirmSwapModal
@@ -377,9 +586,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
           <div className="mb-12">
             <div className="px-5">
               <Exchange
+                chainBalances={balances[activeChains?.from]}
                 // priceImpact={priceImpact}
                 label={`Swap From:`}
-                selectedCurrencyBalance={currentBalances[Field.INPUT]}
+                selectedCurrencyBalance={"0"}
                 value={currentAmount[Field.INPUT]}
                 showMaxButton={true}
                 token={currentTrade[Field.INPUT]}
@@ -404,7 +614,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   dispatch(updateCurrentSelectSide(Field.INPUT))
                 }
                 id="swap-currency-input"
-                onChainChange={(val) => updateChains(val, "fromChain")}
+                onChainChange={(val) => updateChains(val, "from")}
               />
             </div>
             <div className="relative grid py-3">
@@ -437,6 +647,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
             <div className="px-5">
               <Exchange
+                chainBalances={balances[activeChains?.to]}
                 // priceImpact={priceImpact}
                 label={`Swap To:`}
                 selectedCurrencyBalance={currentBalances[Field.OUTPUT]}
@@ -464,21 +675,23 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   dispatch(updateCurrentSelectSide(Field.OUTPUT))
                 }
                 id="swap-currency-output"
-                onChainChange={(val) => updateChains(val, "toChain")}
+                onChainChange={(val) => updateChains(val, "to")}
               />
             </div>
           </div>
           {currentTrade.from &&
             currentTrade.to &&
-            !!query?.fromChain &&
-            !!query?.toChain &&
-            query?.toChain !== query?.fromChain && (
+            activeChains.from &&
+            activeChains.to &&
+            activeChains.to !== activeChains.from && (
               <CustomizedSteppers
                 steps={[
                   {
-                    label: NETWORK_LABEL[Number(activeChains?.fromChain)],
+                    label: NETWORK_LABEL[Number(activeChains?.from)],
                     icon: 1,
-                    logo: NETWORK_ICON[Number(activeChains?.fromChain)],
+                    logo:
+                      NETWORK_ICON[Number(activeChains?.from)] ||
+                      "/icons/livepeer.png",
                   },
                   {
                     label: "Teleport",
@@ -487,18 +700,20 @@ const Swap: React.FC<SwapProps> = ({}) => {
                     logo: "/icons/livepeer.png",
                   },
                   {
-                    label: NETWORK_LABEL[Number(activeChains?.toChain)],
+                    label: NETWORK_LABEL[Number(activeChains?.to)],
                     icon: 3,
-                    logo: NETWORK_ICON[Number(activeChains?.toChain)],
+                    logo:
+                      NETWORK_ICON[Number(activeChains?.to)] ||
+                      "/icons/livepeer.png",
                   },
                 ]}
               />
             )}
           {currentTrade.from &&
             currentTrade.to &&
-            !!query?.fromChain &&
-            !!query?.toChain &&
-            query?.toChain === query?.fromChain && (
+            activeChains?.from &&
+            activeChains?.to &&
+            activeChains?.to === activeChains?.from && (
               <div className="px-5">
                 <ListCard
                   fee="1%"
@@ -506,50 +721,29 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   amount={currentAmount[Field.OUTPUT]}
                   className="flex items-center justify-between"
                 />
-                <div className="flex flex-wrap gap-x-6">
-                  {/* <ListCard
-                    fee="$37.74"
-                    label="Via Uniswap V2"
-                    amount="0.000000000491183"
-                    background="bg-white-2"
-                  />
-                  <ListCard
-                    fee="$37.74"
-                    label="Via 0x"
-                    amount="0.000000000491183"
-                    background="bg-white-2"
-                  />
-                  <ListCard
-                    fee="$37.74"
-                    label="Via 1inch"
-                    amount="0.000000000491183"
-                    background="bg-white-2"
-                  />
-                  <ListCard
-                    fee="$37.74"
-                    label="Via Uniswap V3"
-                    amount="0.000000000491183"
-                    background="bg-white-2"
-                  /> */}
-                </div>
+                <div className="flex flex-wrap gap-x-6"></div>
               </div>
             )}
-          <div className="flex px-5 mt-1">
-            <div className="w-2/3 mr-2">
-              <input
-                type="text"
-                id="token-search-input"
-                placeholder="Enter Destination Address"
-                autoComplete="off"
-                value={evmToAddress}
-                onChange={(e) => setEvmToAddress(e.target.value)}
-                className="w-full bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-3 px-6 py-4 "
-              />
-              <p className="ml-3 text-xs text-grey-100">Destination Address</p>
-            </div>
+          <div className="flex flex-wrap px-5 mt-1">
+            {activeChains.from !== activeChains.to && (
+              <div className="w-full mb-2">
+                <input
+                  type="text"
+                  id="token-search-input"
+                  placeholder="Enter Destination Address"
+                  autoComplete="off"
+                  value={evmToAddress}
+                  onChange={(e) => setEvmToAddress(e.target.value)}
+                  className="w-full bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-3 px-6 py-4 "
+                />
+                <p className="ml-3 text-xs text-grey-100">
+                  Destination Address
+                </p>
+              </div>
+            )}{" "}
             {!account ? (
               <div
-                className="w-1/3 px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={toggleWalletModal}
               >
                 Connect Wallet
@@ -560,39 +754,13 @@ const Swap: React.FC<SwapProps> = ({}) => {
               </div>
             ) : (
               <button
-                className="w-1/3 px-3 py-4 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full h-10 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={async () => {
-                  if (chainId !== Number(query?.fromChain)) {
-                    // connector.activate(Number(query?.fromChain));
-                    console.debug(
-                      `Switching to chain ${Number(query?.fromChain)}`,
-                      SUPPORTED_NETWORKS[Number(query?.fromChain)]
-                    );
-                    const params = SUPPORTED_NETWORKS[Number(query?.fromChain)];
-                    try {
-                      await library?.send("wallet_switchEthereumChain", [
-                        {
-                          chainId: `0x${Number(query?.fromChain).toString(16)}`,
-                        },
-                        account,
-                      ]);
-                    } catch (switchError) {
-                      // This error code indicates that the chain has not been added to MetaMask.
-                      // @ts-ignore TYPE NEEDS FIXING
-                      if (switchError.code === 4902) {
-                        try {
-                          await library?.send("wallet_addEthereumChain", [
-                            params,
-                            account,
-                          ]);
-                        } catch (addError) {
-                          // handle "add" error
-                          console.error(`Add chain error ${addError}`);
-                        }
-                      }
-                      console.error(`Switch chain error ${switchError}`);
-                      // handle other "switch" errors
-                    }
+                  if (bridgeState?.status === "MINTED") {
+                    completeTransaction();
+                    console.log("activechainssss", activeChains);
+                  } else if (chainId !== Number(activeChains?.from)) {
+                    switchChain(activeChains?.from, library, account);
                   } else handleInput();
                 }}
                 id="swap-button"
@@ -608,12 +776,26 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 //   ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
                 // }
               >
-                {loading ? (
+                {bridgeState?.status === "PROCESSING" ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : chainId !== activeChains?.fromChain ? (
+                ) : bridgeState?.status === "MINTED" ? (
+                  <div className="flex h-full">
+                    <div
+                      onClick={() => setBridgeState({ status: "IDLE" })}
+                      className="flex items-center justify-center w-1/3 h-full rounded-l-full bg-red"
+                    >
+                      <RedoRounded />
+                    </div>
+                    <div className="flex items-center justify-center w-2/3 ">
+                      Continue
+                    </div>
+                  </div>
+                ) : chainId !== activeChains?.from ? (
                   `switch to ${
-                    NETWORK_LABEL[Number(query?.fromChain) || 1]
+                    NETWORK_LABEL[Number(activeChains?.from) || 1]
                   } network`
+                ) : bridgeState?.status === "TRANSFERING" ? (
+                  "Transfering"
                 ) : (
                   "Bridge"
                 )}
@@ -622,11 +804,12 @@ const Swap: React.FC<SwapProps> = ({}) => {
           </div>
           {/* <UnsupportedCurrencyFooter show={swapIsUnsupported} currentTrade={[currentTrade.INPUT, currentTrade.OUTPUT]} /> */}
         </div>
-        {query.from && query.to && currentTrade.from !== 0 && (
+        {activeChains.from && activeChains.to && currentTrade.from !== 0 && (
           <TransactionDetail
             evmToAddress={evmToAddress}
             amount={currentAmount[Field.INPUT]}
             token={currentTrade[Field.INPUT]}
+            bridgeState={bridgeState}
           />
         )}
       </div>

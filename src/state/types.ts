@@ -54,11 +54,8 @@ export interface Tags {
     };
 }
 export interface Balance {
-    token_address: string;
     name: string;
     symbol: string;
-    logo?: string;
-    thumbnail?: string;
     decimals: string;
     balance: string;
 }

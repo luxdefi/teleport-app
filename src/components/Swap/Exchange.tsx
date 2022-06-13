@@ -7,7 +7,7 @@ import { FiatValue } from "./FiatValue";
 import Lottie from "lottie-react";
 import { DebounceInput } from "react-debounce-input";
 
-import { Token } from "state/types";
+import { Balance, Token } from "state/types";
 import Logo from "components/Logo";
 import { ChevronDownIcon } from "@heroicons/react/outline";
 import { useGetTokenFiatValue } from "state/swap/hooks";
@@ -40,6 +40,7 @@ interface ExchangePanelProps {
   onKeyDownFunc: () => void;
   onChainChange?: (chain: number) => void;
   onTokenChange?: (token: string) => void;
+  chainBalances: Balance[];
 }
 
 export default function ExchangePanel({
@@ -62,9 +63,13 @@ export default function ExchangePanel({
   onKeyDownFunc,
   onChainChange,
   onTokenChange,
+  chainBalances,
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
-
+  const balance = chainBalances.find(
+    (balance) => balance.symbol == token.symbol
+  );
+  console.log(" balancejnjinsi", balance);
   const handleDismissSearch = useCallback(() => {
     setTimeout(() => {
       setModalOpen(false);
@@ -196,7 +201,10 @@ export default function ExchangePanel({
                   onClick={onMax}
                   className="text-xs font-medium text-right cursor-pointer text-low-emphesis"
                 >
-                  {`Balance:`} {parseFloat(selectedCurrencyBalance).toFixed(2)}{" "}
+                  {`Balance:`}{" "}
+                  {parseFloat(
+                    balance ? Web3.utils.fromWei(balance.balance) : "0"
+                  ).toFixed(2)}{" "}
                   {token.symbol}
                 </div>
                 <FiatValue fiatValue={fiat * parseFloat(value)} />

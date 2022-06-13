@@ -60,7 +60,7 @@ export function useTeleportContract(): (chain) => Contract | null {
   return useCallback(
     (chain) => {
       const contract = altContract("TELEPORT", chain, account, library);
-      console.log('hitting useTeleportContract', chain, contract)
+      console.log('hitting burnContract', chain, contract)
 
       return contract
     },
