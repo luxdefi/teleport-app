@@ -17,8 +17,8 @@ export function useContract(
   useDefault = false
 ): Contract | null {
   const { library, account, chainId } = useActiveWeb3React();
-  let chainIdStr = chain ? chain : chainId ? chainId.toString() : "4";
-  console.log('[nameOrAddress.toString()]', nameOrAddress)
+  let chainIdStr = chain ? chain : chainId ? chainId.toString() : "43113";
+  console.log('[nameOrAddress.toString()]', nameOrAddress, chainIdStr)
   let address: string | undefined = nameOrAddress;
   // const randomWallet = ethers.Wallet.createRandom();
   // const provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/f0c1756bf77c4d8eb525375aa106ebcc') // needs to be added in .env.local || .env, it's dynamic accordin to network and chain

@@ -24,7 +24,6 @@ import { metaMask } from "connectors/metaMask";
 export function getOptions() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { chainId, isActivating } = useActiveWeb3React();
-  const chain = 1 || chainId;
   const isMetamask = window.ethereum && window.ethereum.isMetaMask;
   return Object.keys(SUPPORTED_WALLETS).map((key) => {
     const option = SUPPORTED_WALLETS[key];
@@ -241,7 +240,7 @@ export default function WalletModal({ ENSName }: { ENSName?: string }) {
           )}
           {walletView !== WALLET_VIEWS.PENDING && (
             <Link href="https://ethereum.org/wallets/" passHref>
-              <p className="text-left underline cursor-pointer text-white">
+              <p className="text-left text-white underline cursor-pointer">
                 New to Ethereum? Learn more about wallets
               </p>
             </Link>

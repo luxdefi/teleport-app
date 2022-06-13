@@ -1,11 +1,13 @@
 import { shortenAddress, shortenString } from "functions/format";
+import { getGasPrice } from "functions/trade";
+import useActiveWeb3React from "hooks/useActiveWeb3React";
 import Image from "next/image";
 import React, { useState } from "react";
 
-const TransactionDetail = ({ evmToAddress }) => {
+const TransactionDetail = ({ evmToAddress, amount, token }) => {
   const [show, setShow] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
-
+  const { library } = useActiveWeb3React();
   const copyTextToClipboard = async (text) => {
     if ("clipboard" in navigator) {
       return await navigator.clipboard.writeText(text);
@@ -49,13 +51,15 @@ const TransactionDetail = ({ evmToAddress }) => {
       {show && (
         <>
           <div className="flex flex-col p-5 border-b cursor-pointer border-grey-50">
-            <div className="flex items-center justify-between mb-3.5">
+            {/* <div className="flex items-center justify-between mb-3.5">
               <p>Network fee</p>
-              <p>0.000084 ETH ≈ $0.161</p>
-            </div>
+              <p>{getGasPrice(library)} ETH ≈ $0.161</p>
+            </div> */}
             <div className="flex items-center justify-between">
               <p>Protocol fee</p>
-              <p>0.3% ≈ 0.12367 LUX</p>
+              <p>
+                1% ≈ {amount * 0.001} {token.symbol}
+              </p>
             </div>
           </div>
           <div className="flex flex-col p-5 border-b cursor-pointer border-grey-50">

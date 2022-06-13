@@ -31,7 +31,11 @@ import TransactionDetail from "components/Swap/TransactionDetail";
 import CustomizedSteppers from "components/Stepper";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
-import { NETWORK_LABEL, SUPPORTED_NETWORKS } from "config/networks";
+import {
+  NETWORK_ICON,
+  NETWORK_LABEL,
+  SUPPORTED_NETWORKS,
+} from "config/networks";
 import ListCard from "components/Swap/ListCard";
 import { useLbtcContract, useTeleportContract } from "hooks/useContract";
 import { Contract } from "ethers";
@@ -91,7 +95,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   const initMoralis = useCallback(() => {
     async () => {
-      console.log("initMoralis chainId", chainId);
       if (chainId) {
         try {
           await Moralis.initPlugins();
@@ -107,6 +110,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   }, [Moralis, chainId, fetchUserBalances, getAvailableTokens]);
 
   useEffect(() => {
+    setEvmToAddress(account);
     initMoralis();
   }, [chainId]);
 
@@ -326,6 +330,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
+  console.log("evmToAddress", evmToAddress);
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
@@ -471,20 +476,20 @@ const Swap: React.FC<SwapProps> = ({}) => {
               <CustomizedSteppers
                 steps={[
                   {
-                    label: "LUX",
+                    label: NETWORK_LABEL[Number(activeChains?.fromChain)],
                     icon: 1,
-                    logo: "/icons/uniswap.png",
-                  },
-                  {
-                    label: "Lux",
-                    sublabel: "Smart Routing",
-                    icon: 2,
-                    logo: "/icons/lux-logo.svg",
+                    logo: NETWORK_ICON[Number(activeChains?.fromChain)],
                   },
                   {
                     label: "Teleport",
-                    icon: 3,
+                    sublabel: "Smart Routing",
+                    icon: 2,
                     logo: "/icons/livepeer.png",
+                  },
+                  {
+                    label: NETWORK_LABEL[Number(activeChains?.toChain)],
+                    icon: 3,
+                    logo: NETWORK_ICON[Number(activeChains?.toChain)],
                   },
                 ]}
               />
@@ -496,9 +501,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
             query?.toChain === query?.fromChain && (
               <div className="px-5">
                 <ListCard
-                  fee="$37.74"
-                  label="Via Teleport"
-                  amount="0.000000000491183"
+                  fee="1%"
+                  label="Via 1inch"
+                  amount={currentAmount[Field.OUTPUT]}
                   className="flex items-center justify-between"
                 />
                 <div className="flex flex-wrap gap-x-6">
@@ -530,15 +535,18 @@ const Swap: React.FC<SwapProps> = ({}) => {
               </div>
             )}
           <div className="flex px-5 mt-1">
-            <input
-              type="text"
-              id="token-search-input"
-              placeholder="Enter Destination Address"
-              autoComplete="off"
-              value={evmToAddress}
-              onChange={(e) => setEvmToAddress(e.target.value)}
-              className="w-2/3 bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-11 px-6 py-4 mr-2"
-            />
+            <div className="w-2/3 mr-2">
+              <input
+                type="text"
+                id="token-search-input"
+                placeholder="Enter Destination Address"
+                autoComplete="off"
+                value={evmToAddress}
+                onChange={(e) => setEvmToAddress(e.target.value)}
+                className="w-full bg-transparent border bg-[#1B1D2B] border-[#323546] focus:outline-none rounded-full placeholder-white-50  font-light text-sm pl-3 px-6 py-4 "
+              />
+              <p className="ml-3 text-xs text-grey-100">Destination Address</p>
+            </div>
             {!account ? (
               <div
                 className="w-1/3 px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
@@ -602,21 +610,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 {loading ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : query?.fromChain && chainId !== Number(query?.fromChain) ? (
+                ) : chainId !== activeChains?.fromChain ? (
                   `switch to ${
                     NETWORK_LABEL[Number(query?.fromChain) || 1]
-                  } network` ? (
-                    (query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
-                    query?.to &&
-                    query?.from &&
-                    query?.to === query?.from ? (
-                      "Cannot swap same token"
-                    ) : error ? (
-                      error.description
-                    ) : (
-                      "Switch network"
-                    )
-                  ) : null
+                  } network`
                 ) : (
                   "Bridge"
                 )}
@@ -626,7 +623,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
           {/* <UnsupportedCurrencyFooter show={swapIsUnsupported} currentTrade={[currentTrade.INPUT, currentTrade.OUTPUT]} /> */}
         </div>
         {query.from && query.to && currentTrade.from !== 0 && (
-          <TransactionDetail evmToAddress={evmToAddress} />
+          <TransactionDetail
+            evmToAddress={evmToAddress}
+            amount={currentAmount[Field.INPUT]}
+            token={currentTrade[Field.INPUT]}
+          />
         )}
       </div>
     </main>

@@ -243,15 +243,15 @@ export const SUPPORTED_NETWORKS: {
     blockExplorerUrls: ['https://cchain.explorer.avax.network'],
   },
   [ChainId.LUX_TESTNET]: {
-    chainId: '0xA86A',
+    chainId: '0xa869',
     chainName: 'Lux',
     nativeCurrency: {
       name: 'Lux TESTNET',
-      symbol: 'LUX',
+      symbol: 'LUXT',
       decimals: 18,
     },
-    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
-    blockExplorerUrls: ['https://cchain.explorer.avax.network'],
+    rpcUrls: ['https://api.avax-test.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://testnet.snowtrace.io/'],
   },
   [ChainId.OKEX]: {
     chainId: '0x42',
