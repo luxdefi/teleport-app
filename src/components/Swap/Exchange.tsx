@@ -64,10 +64,7 @@ export default function ExchangePanel({
   onTokenChange,
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const lBTCContract = useLbtcContract();
-  const Web3Api = useMoralisWeb3Api();
 
-  const { account, chainId } = useActiveWeb3React();
   const handleDismissSearch = useCallback(() => {
     setTimeout(() => {
       setModalOpen(false);

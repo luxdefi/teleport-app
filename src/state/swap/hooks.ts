@@ -248,10 +248,10 @@ export function useGetCurrentBalances(): () => void {
 const customChainFunc = async (lBTCContract, account) => {
 
   const value = await Web3.utils.fromWei(
-    (await lBTCContract.balanceOf(account)).toString(),
+    (await lBTCContract?.balanceOf(account)).toString(),
     "ether"
   );
-  console.log('value of balance', value)
+  console.log('lBTCContract value of balance', value)
 }
 // Object.keys(currentTrade).forEach(async (trade) => {
 

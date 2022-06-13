@@ -107,8 +107,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
   }, [Moralis, chainId, fetchUserBalances, getAvailableTokens]);
 
   useEffect(() => {
-    console.log("initMoralis chainId", chainId);
-
     initMoralis();
   }, [chainId]);
 
@@ -164,32 +162,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
   };
 
   //BRIDGE FUNCTIONS
-  const lBTCContract = useLbtcContract();
-
-  async function checkBalanceInput(value) {
-    const usrBalance = Web3.utils.fromWei(
-      (await lBTCContract.balanceOf(account)).toString(),
-      "ether"
-    );
-
-    console.log(
-      "User Balance:",
-      Number(value),
-      Number(usrBalance),
-      Number(value) > Number(usrBalance)
-    );
-
-    if (value && usrBalance) {
-      if (Number(value) > Number(usrBalance)) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
-  }
-
   async function handleInput() {
     await setNets();
     const msgSig = await library
@@ -254,7 +226,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
-
   function setNets() {
     console.log("currentTrade", currentTrade);
     console.log("teleportContract", teleportContract);
@@ -278,7 +249,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
     console.log("TeleportContract TeleportContractMint", TeleportContractMint);
     console.log("fromTeleportAddr", fromTeleportAddr);
   }
-
   //async function handleMint(amount, cnt, fromNetId, toNetId, receipt, tx){
   async function handleMint(amount, cnt, fromNetId, toNetId, tx, msgSig) {
     const amtNoWei = Web3.utils.fromWei(amount.toString());
@@ -356,7 +326,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
-  console.log("currentBalances", currentBalances);
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">

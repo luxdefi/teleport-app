@@ -6,6 +6,7 @@ import { useActiveWeb3React } from "./useActiveWeb3React";
 import { isAddress } from "functions/validate";
 import { abis, addresses } from "constants/contract";
 import { ChainId } from "constants/chainIds";
+import { useDispatch } from "react-redux";
 
 // returns null on errors
 export function useContract(
@@ -55,12 +56,15 @@ export function useLuxContract(): Contract | null {
 }
 export function useTeleportContract(): (chain) => Contract | null {
   const { account, library } = useActiveWeb3React()
+  const dispatch = useDispatch()
   return useCallback(
     (chain) => {
-      console.log('hitting useTeleportContract', chain)
-      return altContract("TELEPORT", chain, account, library);
+      const contract = altContract("TELEPORT", chain, account, library);
+      console.log('hitting useTeleportContract', chain, contract)
+
+      return contract
     },
-    [],
+    [dispatch],
   )
 }
 
