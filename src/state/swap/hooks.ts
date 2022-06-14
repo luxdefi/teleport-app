@@ -162,7 +162,7 @@ export function useFetchUserBalances(): () => void {
   const { chainId, account } = useActiveWeb3React();
   const dispatch = useDispatch();
   const Web3Api = useMoralisWeb3Api();
-  const getCurrentBalances = useGetCurrentBalances();
+  // const getCurrentBalances = useGetCurrentBalances();
   const { activeChains } = useAppSelector((state) => state.swap);
 
   return useCallback(async () => {
@@ -225,55 +225,55 @@ export function useFetchUserBalances(): () => void {
   }, [dispatch, chainId, account]);
 }
 
-export function useGetCurrentBalances(): () => void {
-  const dispatch = useDispatch();
+// export function useGetCurrentBalances(): () => void {
+//   const dispatch = useDispatch();
 
-  const { currentTrade, balances, activeChains } = useAppSelector((state) => state.swap);
-  const { Moralis } = useMoralis();
-  const { account, library } = useActiveWeb3React()
-  // const getQuote = useGetQuote();
+//   const { currentTrade, balances, activeChains } = useAppSelector((state) => state.swap);
+//   const { Moralis } = useMoralis();
+//   const { account, library } = useActiveWeb3React()
+//   // const getQuote = useGetQuote();
 
-  console.log("useGetCurrentBalances", currentTrade);
-  return useCallback(async () => {
-    try {
-      if (currentTrade) {
-        const tokenBalances: { to: number; from: number } = {
-          to: 0,
-          from: 0,
-        };
-        console.log(
-          "useGetCurrentBalances in tokenBalances",
-          tokenBalances,
-          currentTrade,
-          balances
-        );
+//   console.log("useGetCurrentBalances", currentTrade);
+//   return useCallback(async () => {
+//     try {
+//       if (currentTrade) {
+//         const tokenBalances: { to: number; from: number } = {
+//           to: 0,
+//           from: 0,
+//         };
+//         console.log(
+//           "useGetCurrentBalances in tokenBalances",
+//           tokenBalances,
+//           currentTrade,
+//           balances
+//         );
 
-        Object.keys(currentTrade).forEach((trade) => {
-          if (activeChains[trade] !== 4) {
-            const lBTCContract = altContract('LBTC', activeChains[trade], account, library)
-            console.log('lBTCContract', activeChains[trade], lBTCContract)
-            if (lBTCContract) {
-              customChainFunc(lBTCContract, account)
+//         Object.keys(currentTrade).forEach((trade) => {
+//           if (activeChains[trade] !== 4) {
+//             const lBTCContract = altContract('LBTC', activeChains[trade], account, library)
+//             console.log('lBTCContract', activeChains[trade], lBTCContract)
+//             if (lBTCContract) {
+//               customChainFunc(lBTCContract, account)
 
-            }
-          }
-          const tradeBalance = balances.find(
-            (balance) => balance.symbol === currentTrade[trade].symbol
-          );
-          tokenBalances[trade] =
-            balances.length > 0 && tradeBalance
-              ? Moralis.Units.FromWei(tradeBalance.balance)
-              : "0";
-        });
-        console.log("tokenBalances", tokenBalances);
-        dispatch(updateCurrentBalances(tokenBalances));
-        // getQuote(currentAmount)
-      }
-    } catch (error) {
-      console.log("error in useFetchUserBalances", error);
-    }
-  }, [dispatch, currentTrade, balances]);
-}
+//             }
+//           }
+//           const tradeBalance = balances.find(
+//             (balance) => balance.symbol === currentTrade[trade].symbol
+//           );
+//           tokenBalances[trade] =
+//             balances.length > 0 && tradeBalance
+//               ? Moralis.Units.FromWei(tradeBalance.balance)
+//               : "0";
+//         });
+//         console.log("tokenBalances", tokenBalances);
+//         dispatch(updateCurrentBalances(tokenBalances));
+//         // getQuote(currentAmount)
+//       }
+//     } catch (error) {
+//       console.log("error in useFetchUserBalances", error);
+//     }
+//   }, [dispatch, currentTrade, balances]);
+// }
 const customChainFunc = async (lBTCContract, account) => {
 
   const value = await Web3.utils.fromWei(

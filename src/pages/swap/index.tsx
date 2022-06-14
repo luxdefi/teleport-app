@@ -5,7 +5,6 @@ import {
   useBridge,
   useFetchUserBalances,
   useGetAvailableTokens,
-  useGetCurrentBalances,
   useGetQuote,
   useSwap,
   useUpdateActiveChains,
@@ -60,7 +59,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const toggleWalletModal = useWalletModalToggle();
   const getAvailableTokens = useGetAvailableTokens();
   const fetchUserBalances = useFetchUserBalances();
-  const getCurrentBalances = useGetCurrentBalances();
   const swapTokens = useSwap();
   const bridgeTokens = useBridge();
   const getQuote = useGetQuote();
@@ -143,9 +141,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   useEffect(() => {
     if (currentTrade) {
-      getCurrentBalances();
+      fetchUserBalances();
     }
-  }, [currentTrade, balances]);
+  }, [currentTrade]);
 
   const handleChange = (value, side?) => {
     const newAmount = { ...currentAmount, [side || currentSelectSide]: value };

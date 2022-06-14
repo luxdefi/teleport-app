@@ -67,7 +67,7 @@ export default function ExchangePanel({
 }: ExchangePanelProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const balance = chainBalances.find(
-    (balance) => balance.symbol == token.symbol
+    (balance) => balance.symbol == token?.symbol
   );
   console.log(" balancejnjinsi", balance);
   const handleDismissSearch = useCallback(() => {

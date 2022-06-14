@@ -9,7 +9,7 @@ import React, { FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useGasPrice } from "state/network/hooks";
 import { AppState } from "state/store";
-import { useFetchUserBalances, useGetCurrentBalances } from "state/swap/hooks";
+import { useFetchUserBalances } from "state/swap/hooks";
 import { Token } from "state/types";
 
 const getQuery = (input: any, output: any) => {
