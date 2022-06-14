@@ -500,6 +500,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 status: "SUCCESS",
                 text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
               });
+              setTimeout(() => {
+                setBridgeState({
+                  status: "SUCCESS",
+                });
+              }, 2000);
               return;
             } else {
               setBridgeState({
@@ -530,6 +535,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
               status: "SUCCESS",
               text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
             });
+            setTimeout(() => {
+              setBridgeState({
+                status: "SUCCESS",
+              });
+            }, 2000);
           }
 
           TeleportContractMint.removeAllListeners(["BridgeMinted"]);
