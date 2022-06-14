@@ -69,7 +69,6 @@ export default function ExchangePanel({
   const balance = chainBalances.find(
     (balance) => balance.symbol == token?.symbol
   );
-  console.log(" balancejnjinsi", balance);
   const handleDismissSearch = useCallback(() => {
     setTimeout(() => {
       setModalOpen(false);
@@ -89,7 +88,6 @@ export default function ExchangePanel({
     console.log("valll getTokenFiatValue here", val);
     setFiat(val);
   }, [getTokenFiatValue, token?.address, token?.isNative]);
-  console.log("the_token", token);
   useEffect(() => {
     initFetch();
   }, [initFetch, token]);

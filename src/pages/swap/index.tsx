@@ -193,25 +193,32 @@ const Swap: React.FC<SwapProps> = ({}) => {
   //BRIDGE FUNCTIONS
   async function handleInput() {
     setBridgeState({ ...bridgeState, status: "PROCESSING" });
-    await setNets();
+    const teleportContractBurn2 = await setNets();
     const msgSig = await library
       ?.getSigner()
       .signMessage("Sign to prove you are initiator of transaction.");
 
     try {
       const amt = Web3.utils.toWei(currentAmount[Field.INPUT].toString()); // Convert intialAmt toWei
-      console.log("TeleportContractBurn:", TeleportContractBurn);
+      console.log(
+        "teleportContractBurn2:",
+        teleportContractBurn2,
+        amt,
+        currentTrade[Field.INPUT].address
+      );
 
-      const tx = await TeleportContractBurn.bridgeBurn(
+      const tx = await teleportContractBurn2.bridgeBurn(
         amt,
         currentTrade[Field.INPUT].address
       ); // Burn coins
+      console.log("txxxxx:", tx);
 
       let cnt = 0;
 
       // Listen for burning completion
-      TeleportContractBurn.once("BridgeBurned", async (caller, amount) => {
+      teleportContractBurn2.once("BridgeBurned", async (caller, amount) => {
         console.log("Recipient:", caller);
+
         console.log("Amount:", amount.toString());
 
         if (cnt == 0) {
@@ -237,10 +244,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
         return;
       } else {
         console.log("Receipt received");
-        TeleportContractBurn.off("BridgeBurned");
-        TeleportContractBurn.removeAllListeners(["BridgeBurned"]);
-        setBridgeState({ ...bridgeState, status: "BURNED" });
+        teleportContractBurn2.off("BridgeBurned");
+        teleportContractBurn2.removeAllListeners(["BridgeBurned"]);
+
         if (cnt == 0) {
+          setBridgeState({ ...bridgeState, status: "BURNED" });
           console.log(
             "cookie array:",
             amt,
@@ -271,6 +279,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
     const fromNetRadio = activeChains?.from;
     const toNetRadio = activeChains?.to;
     console.log("chains", fromNetRadio, toNetRadio);
+    let teleportContractBurn2;
     try {
       if (fromNetRadio == "43113" && toNetRadio == "4") {
         // && tokenName == "LuxBTC" => check if token is LBTC or LETH
@@ -282,6 +291,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         setFromTeleportAddr(addresses.Teleport_Lux);
       } else if (fromNetRadio == "4" && toNetRadio == "43113") {
         setTeleportContractBurn(altContract("TELEPORT", 4, account, library)); //set contract burn to teleport eth contract
+        teleportContractBurn2 = altContract("TELEPORT", 4, account, library);
         setTeleportContractMint(
           altContract("TELEPORT", 43113, account, library)
         ); //set contract mint to teleport lux contract
@@ -296,7 +306,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
     console.log("TeleportContract TeleportContractBurn", TeleportContractBurn);
     console.log("TeleportContract TeleportContractMint", TeleportContractMint);
-    console.log("fromTeleportAddr", fromTeleportAddr);
+    console.log("teleportContractBurn2", teleportContractBurn2);
+    return teleportContractBurn2;
   }
 
   //async function handleMint(amount, cnt, fromNetId, toNetId, receipt, tx){
@@ -376,31 +387,31 @@ const Swap: React.FC<SwapProps> = ({}) => {
       await switchChain(activeChains?.to, library, account);
     }
     console.log("completeTransaction 1", TeleportContractMint);
-    // try {
-    //   if (!TeleportContractMint) {
-    //     console.log(
-    //       " completeTransaction TeleportContractMintError:",
-    //       TeleportContractMint
-    //     );
-    //     throw new Error(" completeTransaction Bad contract mint object.");
-    //   }
-    //   console.log("completeTransaction 2");
+    try {
+      if (!TeleportContractMint) {
+        console.log(
+          " completeTransaction TeleportContractMintError:",
+          TeleportContractMint
+        );
+        throw new Error(" completeTransaction Bad contract mint object.");
+      }
+      console.log("completeTransaction 2");
 
-    //   // Check if key exists to know if transaction was already completed.
-    //   const keyExists = await TeleportContractMint.keyExistsTx(
-    //     bridgeState?.signature
-    //   );
+      // Check if key exists to know if transaction was already completed.
+      const keyExists = await TeleportContractMint.keyExistsTx(
+        bridgeState?.signature
+      );
 
-    //   console.log("keyExists", keyExists);
+      console.log("keyExists", keyExists);
 
-    //   if (keyExists) {
-    //     console.log("key exists");
-    //   }
-    // } catch (err) {
-    //   console.log("completeTransaction Transaction Failure. 1", err);
-    //   // setBridgeState({ ...bridgeState, status: "FAILED" });
-    //   return;
-    // }
+      if (keyExists) {
+        console.log("key exists");
+      }
+    } catch (err) {
+      console.log("completeTransaction Transaction Failure. 1", err);
+      // setBridgeState({ ...bridgeState, status: "FAILED" });
+      return;
+    }
     console.log("completeTransaction 3", signature, hashedTxId, status);
 
     if (signature && hashedTxId && status !== "SUCCESS") {
@@ -435,7 +446,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
           signature,
           currentTrade[Field.OUTPUT].address.toString(),
           activeChains?.to.toString(),
-          "false"
+          "false",
+          {
+            gasLimit: 4000000,
+          }
         );
         console.log("completeTransaction 6 TX: in TeleportContractMint", tx);
 
@@ -754,7 +768,11 @@ const Swap: React.FC<SwapProps> = ({}) => {
               <button
                 className="w-full h-10 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={async () => {
-                  if (bridgeState?.status === "MINTED") {
+                  if (
+                    bridgeState?.status === "MINTED" ||
+                    bridgeState?.status === "TRANSFERING" ||
+                    bridgeState?.status === "BURNED"
+                  ) {
                     completeTransaction();
                     console.log("activechainssss", activeChains);
                   } else if (chainId !== Number(activeChains?.from)) {
@@ -776,7 +794,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 {bridgeState?.status === "PROCESSING" ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : bridgeState?.status === "MINTED" ? (
+                ) : bridgeState?.status === "MINTED" ||
+                  bridgeState?.status === "BURNED" ? (
                   <div className="flex h-full">
                     <div
                       onClick={() => setBridgeState({ status: "IDLE" })}

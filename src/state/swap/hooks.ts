@@ -136,8 +136,8 @@ export function useUpdateActiveChains(): (chain: ChainId, side: 'from' | 'to') =
   const aChains = useSelector((state: AppState) => state.swap.activeChains);
   return useCallback(
     (chain: number, side: string) => {
-      console.log('useUpdateActiveChains sidee', side)
-      console.log('useUpdateActiveChains chainnnnn', chain)
+      // console.log('useUpdateActiveChains sidee', side)
+      // console.log('useUpdateActiveChains chainnnnn', chain)
       const chainSide = side === 'to' ? 'toChain' : 'fromChain'
       router.query[chainSide] = String(chain);
       router.push(router);
@@ -157,7 +157,6 @@ export function useUpdateActiveChains(): (chain: ChainId, side: 'from' | 'to') =
 }
 
 export function useFetchUserBalances(): () => void {
-  console.log("initMoralis chainId useFetchUserBalances");
 
   const { chainId, account } = useActiveWeb3React();
   const dispatch = useDispatch();
@@ -432,7 +431,6 @@ export function useSwap(): () => void {
 export function useGetTokenFiatValue(): (address) => Promise<number> {
   const Web3Api = useMoralisWeb3Api();
   const { chainId } = useActiveWeb3React();
-  console.log("valll useGetTokenFiatValue here started");
 
   return useCallback(
     async (address) => {
@@ -441,13 +439,11 @@ export function useGetTokenFiatValue(): (address) => Promise<number> {
           chain: SUPPORTED_NETWORKS[chainId].chainId,
           address,
         };
-        console.log("valll here doing something");
         const price = await Web3Api.token.getTokenPrice(options);
-        console.log("valll here done", price);
 
         return price.usdPrice;
       } catch (error) {
-        console.log("valll here error in useGetTokenFiatValue", error);
+        // console.log("valll here error in useGetTokenFiatValue", error);
       }
     },
     [chainId]
