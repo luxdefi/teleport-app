@@ -695,7 +695,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   },
                   {
                     label: "Teleport",
-                    sublabel: "Smart Routing",
+                    sublabel: "Private Routing",
                     icon: 2,
                     logo: "/icons/livepeer.png",
                   },
