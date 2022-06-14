@@ -102,7 +102,7 @@ export default function CustomizedSteppers({ steps }: { steps: Step[] }) {
                   {label.label}
                 </p>
                 {label.sublabel && (
-                  <p className="opacity-50 text-xs text-white">Smart Routing</p>
+                  <p className="opacity-50 text-xs text-white">Private Routing</p>
                 )}
               </StepLabel>
             </Step>
