@@ -77,33 +77,20 @@ export default function ExchangePanel({
 
   const [fiat, setFiat] = useState(0);
   // const fiatValue =
-  const getTokenFiatValue = useGetTokenFiatValue();
+  // const getTokenFiatValue = useGetTokenFiatValue();
 
-  const initFetch = useCallback(async () => {
-    const val = await getTokenFiatValue(
-      token?.isNative
-        ? "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-        : token?.address
-    );
-    console.log("valll getTokenFiatValue here", val);
-    setFiat(val);
-  }, [getTokenFiatValue, token?.address, token?.isNative]);
-  useEffect(() => {
-    initFetch();
-  }, [initFetch, token]);
-  // const clickMe = async () => {
-  //   const usrBalance = Web3.utils.fromWei(
-  //     (await lBTCContract.balanceOf(account)).toString(),
-  //     "ether"
+  // const initFetch = useCallback(async () => {
+  //   const val = await getTokenFiatValue(
+  //     token?.isNative
+  //       ? "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  //       : token?.address
   //   );
-  //   console.log("usrBalance", usrBalance);
-  //   const options: { chain?: any; address: string } = {
-  //     chain: SUPPORTED_NETWORKS[chainId].chainId,
-  //     address: account,
-  //   };
-  //   const balanc = await Web3Api.account.getTokenBalances(options);
-  //   console.log("balanc", balanc);
-  // };
+  //   console.log("valll getTokenFiatValue here", val);
+  //   setFiat(val);
+  // }, [getTokenFiatValue, token?.address, token?.isNative]);
+  // useEffect(() => {
+  //   initFetch();
+  // }, [initFetch, token]);
   const onKeyDown = function (e) {
     var key = e.keyCode ?? e.which;
 
