@@ -139,13 +139,13 @@ const Swap: React.FC<SwapProps> = ({}) => {
     } else {
       if (side === Field.INPUT) {
         console.log("okurrrrurhuinsjcd");
-        newAmount.to = value - value * 0.001;
+        newAmount.to = (value - value * 0.001).toString();
       } else {
         console.log("init value", newAmount);
         const newVal = value * 0.001;
         console.log(" value * 0.001 value", value, newVal);
 
-        newAmount.from = newVal + value;
+        newAmount.from = (newVal + value).toString();
       }
     }
     if (currentBalances[Field.INPUT] < newAmount.from) {
