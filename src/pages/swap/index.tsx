@@ -427,8 +427,10 @@ const Swap: React.FC<SwapProps> = ({}) => {
           toTargetAddrHash,
           "toNetIdHash",
           toNetIdHash,
+          "currentAmount",
+          currentAmount[Field.INPUT],
           "currentAmount[Field.INPUT]",
-          Web3.utils.toWei(currentAmount[Field.INPUT]),
+          Web3.utils.toWei(currentAmount[Field.INPUT].toString()),
           "hashedTxId",
           hashedTxId,
           "signature",
@@ -440,7 +442,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         );
 
         const tx = await TeleportContractMint.bridgeMintStealth(
-          Web3.utils.toWei(currentAmount[Field.INPUT]),
+          Web3.utils.toWei(currentAmount[Field.INPUT].toString()),
           hashedTxId.toString(),
           evmToAddress.toString(),
           signature,
