@@ -91,18 +91,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
     status: "IDLE",
   });
   const router = useRouter();
-  // get query
-  const query = router.query;
-  // console.log("app_query", query?.toChain, query?.fromChain);
-
-  // useEffect(() => {
-  //   if (!query.fromChain) {
-  //     fromChain(ChainId.MAINNET);
-  //   }
-  //   if (!query.toChain) {
-  //     toChain(ChainId.MAINNET);
-  //   }
-  // }, [fromChain, query.fromChain, query.toChain, toChain]);
 
   const {
     currentAmount,
@@ -114,9 +102,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
     activeChains,
   } = useAppSelector((state: AppState) => state.swap);
 
-  // useEffect(() => {
-  //   getAvailableTokens();
-  // }, [getAvailableTokens]);
+  const isCrossChain = activeChains?.from !== activeChains?.toChain;
 
   const initMoralis = useCallback(() => {
     async () => {
@@ -147,6 +133,21 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   const handleChange = (value, side?) => {
     const newAmount = { ...currentAmount, [side || currentSelectSide]: value };
+
+    if (!isCrossChain) {
+      getQuote(newAmount, side);
+    } else {
+      if (side === Field.INPUT) {
+        console.log("okurrrrurhuinsjcd");
+        newAmount.to = value - value * 0.001;
+      } else {
+        console.log("init value", newAmount);
+        const newVal = value * 0.001;
+        console.log(" value * 0.001 value", value, newVal);
+
+        newAmount.from = newVal + value;
+      }
+    }
     if (currentBalances[Field.INPUT] < newAmount.from) {
       dispatch(
         updateError({
@@ -162,7 +163,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
       updateCurrentSelectSide(side);
     }
     dispatch(updateCurrentAmount(newAmount));
-    getQuote(newAmount, side);
   };
   const onSwitchTokens = () => {
     router.query["fromChain"] = String(activeChains.to);
@@ -551,7 +551,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
       return;
     }
   }
-
   return (
     <main className="flex flex-col items-center justify-center flex-grow w-full h-full px-2 mt-24 sm:px-0">
       <div id="swap-page" className="w-full max-w-xl py-4 md:py-8 lg:py-12">
@@ -570,7 +569,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
             <SwapHeader
               input={currentTrade[Field.INPUT]}
               output={currentTrade[Field.OUTPUT]}
-              crossChain={activeChains?.from !== activeChains?.toChain}
+              crossChain={isCrossChain}
               bothSelected={
                 currentTrade.from &&
                 currentTrade.to &&
@@ -605,7 +604,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 value={currentAmount[Field.INPUT]}
                 showMaxButton={true}
                 token={currentTrade[Field.INPUT]}
-                onUserInput={handleChange}
+                onUserInput={(val) =>
+                  handleChange(parseFloat(val), Field.INPUT)
+                }
                 onMax={() =>
                   handleChange(currentBalances[Field.INPUT], Field.INPUT)
                 }
@@ -666,7 +667,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 value={currentAmount[Field.OUTPUT]}
                 showMaxButton={true}
                 token={currentTrade[Field.OUTPUT]}
-                onUserInput={handleChange}
+                onUserInput={(val) =>
+                  handleChange(parseFloat(val), Field.OUTPUT)
+                }
                 onMax={() =>
                   handleChange(currentBalances[Field.OUTPUT], Field.OUTPUT)
                 }

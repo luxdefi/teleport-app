@@ -10,19 +10,32 @@ import { Popover } from "@headlessui/react";
 import Web3Network from "../Web3Network";
 import Web3Status from "../Web3Status";
 import { useActiveWeb3React } from "../../hooks/useActiveWeb3React";
-import { NATIVE } from "constants/chainIds";
+import { ChainId, NATIVE } from "constants/chainIds";
 import useBalances from "hooks/useBalance";
 import { useGetLuxBalance } from "state/Lux/hooks";
 import { formatBalance } from "functions/format";
 import { SUPPORTED_NETWORKS } from "config/networks";
 import MenuIcon from "components/Icons/MenuIcon";
-// import { ChainId } from '../../config/networks'
+import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
+import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import { addresses } from "constants/contract";
+import { metaMask } from "connectors/metaMask";
 
-// import { ExternalLink, NavLink } from "./Link";
-// import { ReactComponent as Burger } from "../assets/images/burger.svg";
-
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#f5f5f9",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+  },
+}));
 function AppBar(): JSX.Element {
-  const { account, chainId, library, accounts } = useActiveWeb3React();
+  const { account, chainId, library, accounts, connector } =
+    useActiveWeb3React();
   const [activeType, setActiveType] = useState<string>("swap");
   const [isOpen, setOpen] = useState<boolean>(false);
 
@@ -33,6 +46,8 @@ function AppBar(): JSX.Element {
       getBalance(account);
     }
   }, [account, chainId]);
+  const chainAddresses =
+    (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
 
   return (
     //     // <header className="flex flex-row justify-between w-screen flex-nowrap">
@@ -85,98 +100,76 @@ function AppBar(): JSX.Element {
                   </button> */}
                   <div className="fixed bottom-0 left-0 z-10 flex flex-row items-center justify-center w-full p-4 lg:w-auto bg-dark-1000 lg:relative lg:p-0 lg:bg-transparent">
                     <div className="flex items-center justify-between w-full space-x-2 sm:justify-end">
-                      {/* {chainId && [ChainId.MAINNET].includes(chainId) && library && library.provider.isMetaMask && (
-                      <>
-                        <QuestionHelper text={i18n._(t`Add xSUSHI to your MetaMask wallet`)}>
-                          <div
-                            className="hidden p-0.5 rounded-md cursor-pointer sm:inline-flex bg-dark-900 hover:bg-dark-800"
-                            onClick={() => {
-                              if (library && library.provider.isMetaMask && library.provider.request) {
-                                const params: any = {
-                                  type: 'ERC20',
-                                  options: {
-                                    address: '0x8798249c2e607446efb7ad49ec89dd1865ff4272',
-                                    symbol: 'XSUSHI',
-                                    decimals: 18,
-                                    image:
-                                      'https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/ethereum/assets/0x8798249c2E607446EfB7Ad49eC89dD1865Ff4272/logo.png',
-                                  },
+                      {chainId && connector && connector === metaMask && (
+                        <HtmlTooltip
+                          title={
+                            <React.Fragment>
+                              <Typography color="inherit">
+                                Import SPJ
+                              </Typography>
+                              <p>
+                                By clicking this icon, LBTC token would be
+                                imported to your wallet as a custom token
+                              </p>
+                            </React.Fragment>
+                          }
+                        >
+                          <div className="inline-flex w-[25px]">
+                            <div
+                              className="flex border rounded-md cursor-pointer border-accent sm:inline-flex bg-dark-900 hover:bg-dark-800"
+                              onClick={() => {
+                                const tokenAddress = chainAddresses.LBTC;
+                                const tokenSymbol = "LBTC";
+                                const tokenDecimals = 18;
+                                const tokenImage =
+                                  window.location.origin +
+                                  "/icons/lux-triangle.png";
+                                if (
+                                  connector &&
+                                  connector === metaMask &&
+                                  connector.provider.request
+                                ) {
+                                  const params: any = {
+                                    type: "ERC20",
+                                    options: {
+                                      address: tokenAddress,
+                                      symbol: tokenSymbol,
+                                      decimals: tokenDecimals,
+                                      image: tokenImage,
+                                    },
+                                  };
+                                  connector.provider
+                                    .request({
+                                      method: "wallet_watchAsset",
+                                      params,
+                                    })
+                                    .then((success) => {
+                                      if (success) {
+                                        console.log(
+                                          "Successfully added LBTC to MetaMask"
+                                        );
+                                      } else {
+                                        throw new Error(
+                                          "Something went wrong."
+                                        );
+                                      }
+                                    })
+                                    .catch(console.error);
                                 }
-                                library.provider
-                                  .request({
-                                    method: 'wallet_watchAsset',
-                                    params,
-                                  })
-                                  .then((success) => {
-                                    if (success) {
-                                      console.log('Successfully added XSUSHI to MetaMask')
-                                    } else {
-                                      throw new Error('Something went wrong.')
-                                    }
-                                  })
-                                  .catch(console.error)
-                              }
-                            }}
-                          >
-                            <Image
-                              src="/images/tokens/xsushi-square.jpg"
-                              alt="xSUSHI"
-                              width="38px"
-                              height="38px"
-                              objectFit="contain"
-                              className="rounded-md"
-                            />
+                              }}
+                            >
+                              <Image
+                                src="/icons/lux-triangle.png"
+                                alt="LBTC"
+                                width={30}
+                                height={30}
+                                objectFit="contain"
+                                className="rounded-md"
+                              />
+                            </div>
                           </div>
-                        </QuestionHelper>
-                      </>
-                    )}
-
-                    {chainId && chainId in SUSHI_ADDRESS && library && library.provider.isMetaMask && (
-                      <>
-                        <QuestionHelper text={i18n._(t`Add SUSHI to your MetaMask wallet`)}>
-                          <div
-                            className="hidden rounded-md cursor-pointer sm:inline-flex bg-dark-900 hover:bg-dark-800 p-0.5"
-                            onClick={() => {
-                              const params: any = {
-                                type: 'ERC20',
-                                options: {
-                                  address: SUSHI_ADDRESS[chainId],
-                                  symbol: 'SUSHI',
-                                  decimals: 18,
-                                  image:
-                                    'https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/ethereum/assets/0x6B3595068778DD592e39A122f4f5a5cF09C90fE2/logo.png',
-                                },
-                              }
-                              if (library && library.provider.isMetaMask && library.provider.request) {
-                                library.provider
-                                  .request({
-                                    method: 'wallet_watchAsset',
-                                    params,
-                                  })
-                                  .then((success) => {
-                                    if (success) {
-                                      console.log('Successfully added SUSHI to MetaMask')
-                                    } else {
-                                      throw new Error('Something went wrong.')
-                                    }
-                                  })
-                                  .catch(console.error)
-                              }
-                            }}
-                          >
-                            <Image
-                              src="/images/tokens/sushi-square.jpg"
-                              alt="SUSHI"
-                              width="38px"
-                              height="38px"
-                              objectFit="contain"
-                              className="rounded-md"
-                            />
-                          </div>
-                        </QuestionHelper>
-                      </>
-                    )} */}
-
+                        </HtmlTooltip>
+                      )}
                       {library && library.provider.isMetaMask && (
                         <div className="hidden sm:inline-block">
                           <Web3Network />
