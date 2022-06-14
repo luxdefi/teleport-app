@@ -68,13 +68,7 @@ const TransactionDetail = ({ evmToAddress, amount, token, bridgeState }) => {
               </p>
             </div>
             <div className="flex items-center justify-between">
-              {bridgeState?.status === "SUCCESS" && (
-                <p className="mt-4 text-xs text-center">
-                  If the Teleport token hasnt already been added to your wallet
-                  yet, use the button below to add it. Make sure to add it to
-                  the right MetaMask account.
-                </p>
-              )}
+              <p className="mt-4 text-xs text-center">{bridgeState?.text}</p>
             </div>
           </div>
           <div className="flex flex-col p-5 cursor-pointer">

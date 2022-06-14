@@ -260,7 +260,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         }
       }
     } catch (err) {
-      console.log("Error:", err);
+      console.log("Error: inhandle input", err);
       return;
     }
   }
@@ -376,31 +376,31 @@ const Swap: React.FC<SwapProps> = ({}) => {
       await switchChain(activeChains?.to, library, account);
     }
     console.log("completeTransaction 1", TeleportContractMint);
-    try {
-      if (!TeleportContractMint) {
-        console.log(
-          " completeTransaction TeleportContractMintError:",
-          TeleportContractMint
-        );
-        throw new Error(" completeTransaction Bad contract mint object.");
-      }
-      console.log("completeTransaction 2");
+    // try {
+    //   if (!TeleportContractMint) {
+    //     console.log(
+    //       " completeTransaction TeleportContractMintError:",
+    //       TeleportContractMint
+    //     );
+    //     throw new Error(" completeTransaction Bad contract mint object.");
+    //   }
+    //   console.log("completeTransaction 2");
 
-      // Check if key exists to know if transaction was already completed.
-      const keyExists = await TeleportContractMint.keyExistsTx(
-        bridgeState?.signature
-      );
+    //   // Check if key exists to know if transaction was already completed.
+    //   const keyExists = await TeleportContractMint.keyExistsTx(
+    //     bridgeState?.signature
+    //   );
 
-      console.log("keyExists", keyExists);
+    //   console.log("keyExists", keyExists);
 
-      if (keyExists) {
-        console.log("key exists");
-      }
-    } catch (err) {
-      console.log("completeTransaction Transaction Failure. 1", err);
-      // setBridgeState({ ...bridgeState, status: "FAILED" });
-      return;
-    }
+    //   if (keyExists) {
+    //     console.log("key exists");
+    //   }
+    // } catch (err) {
+    //   console.log("completeTransaction Transaction Failure. 1", err);
+    //   // setBridgeState({ ...bridgeState, status: "FAILED" });
+    //   return;
+    // }
     console.log("completeTransaction 3", signature, hashedTxId, status);
 
     if (signature && hashedTxId && status !== "SUCCESS") {
@@ -520,12 +520,12 @@ const Swap: React.FC<SwapProps> = ({}) => {
           TeleportContractMint.removeAllListeners(["BridgeMinted"]);
         }
       } catch (err) {
-        console.log("Error:", err);
-        setBridgeState({
-          ...bridgeState,
-          status: "FAILED",
-          text: `Transaction Failure: ${err.message}`,
-        });
+        console.log("Error in complete transaction:", err);
+        // setBridgeState({
+        //   ...bridgeState,
+        //   status: "FAILED",
+        //   text: `Transaction Failure: ${err.message}`,
+        // });
         return;
       }
     } else {

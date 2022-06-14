@@ -161,7 +161,9 @@ export function getOptions() {
                       ))
                     : (console.log("clicked me alsooo", option.connector),
                       option.connector.activate(
-                        chainId === -1 ? undefined : getAddChainParameters(1)
+                        chainId === -1
+                          ? undefined
+                          : getAddChainParameters(chainId)
                       ));
                 }
           }
