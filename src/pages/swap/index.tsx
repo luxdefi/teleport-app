@@ -134,20 +134,20 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const handleChange = (value, side?) => {
     const newAmount = { ...currentAmount, [side || currentSelectSide]: value };
 
-    if (!isCrossChain) {
-      getQuote(newAmount, side);
-    } else {
-      if (side === Field.INPUT) {
-        console.log("okurrrrurhuinsjcd");
-        newAmount.to = (value - value * 0.001).toString();
-      } else {
-        console.log("init value", newAmount);
-        const newVal = value * 0.001;
-        console.log(" value * 0.001 value", value, newVal);
+    // if (!isCrossChain) {
+    getQuote(newAmount, side);
+    // } else {
+    //   if (side === Field.INPUT) {
+    //     console.log("okurrrrurhuinsjcd");
+    //     newAmount.to = (value - value * 0.001).toString();
+    //   } else {
+    //     console.log("init value", newAmount);
+    //     const newVal = value * 0.001;
+    //     console.log(" value * 0.001 value", value, newVal);
 
-        newAmount.from = (newVal + value).toString();
-      }
-    }
+    //     newAmount.from = (newVal + value).toString();
+    //   }
+    // }
     if (currentBalances[Field.INPUT] < newAmount.from) {
       dispatch(
         updateError({
@@ -430,7 +430,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
           "currentAmount",
           currentAmount[Field.INPUT],
           "currentAmount[Field.INPUT]",
-          Web3.utils.toWei(currentAmount[Field.INPUT].toString()),
+          Web3.utils.toWei(currentAmount[Field.INPUT]),
           "hashedTxId",
           hashedTxId,
           "signature",
@@ -442,7 +442,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
         );
 
         const tx = await TeleportContractMint.bridgeMintStealth(
-          Web3.utils.toWei(currentAmount[Field.INPUT].toString()),
+          Web3.utils.toWei(currentAmount[Field.INPUT]),
           hashedTxId.toString(),
           evmToAddress.toString(),
           signature,
@@ -606,9 +606,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 value={currentAmount[Field.INPUT]}
                 showMaxButton={true}
                 token={currentTrade[Field.INPUT]}
-                onUserInput={(val) =>
-                  handleChange(parseFloat(val), Field.INPUT)
-                }
+                onUserInput={(val) => handleChange(val, Field.INPUT)}
                 onMax={() =>
                   handleChange(currentBalances[Field.INPUT], Field.INPUT)
                 }
@@ -669,9 +667,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 value={currentAmount[Field.OUTPUT]}
                 showMaxButton={true}
                 token={currentTrade[Field.OUTPUT]}
-                onUserInput={(val) =>
-                  handleChange(parseFloat(val), Field.OUTPUT)
-                }
+                onUserInput={(val) => handleChange(val, Field.OUTPUT)}
                 onMax={() =>
                   handleChange(currentBalances[Field.OUTPUT], Field.OUTPUT)
                 }
