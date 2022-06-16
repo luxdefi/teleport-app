@@ -12,7 +12,6 @@ import Web3Status from "../Web3Status";
 import { useActiveWeb3React } from "../../hooks/useActiveWeb3React";
 import { ChainId, NATIVE } from "constants/chainIds";
 import useBalances from "hooks/useBalance";
-import { useGetLuxBalance } from "state/Lux/hooks";
 import { formatBalance } from "functions/format";
 import { SUPPORTED_NETWORKS } from "config/networks";
 import MenuIcon from "components/Icons/MenuIcon";
@@ -40,12 +39,7 @@ function AppBar(): JSX.Element {
   const [isOpen, setOpen] = useState<boolean>(false);
 
   const balances = useBalances(library, accounts);
-  const getBalance = useGetLuxBalance();
-  useEffect(() => {
-    if (account) {
-      getBalance(account);
-    }
-  }, [account, chainId]);
+
   const chainAddresses =
     (addresses[chainId] as any) || (addresses[ChainId.MAINNET] as any);
 

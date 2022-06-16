@@ -51,9 +51,9 @@ export function useContract(
   }, [nameOrAddress, address, ABI, library, withSignerIfPossible, account]);
 }
 
-export function useLuxContract(): Contract | null {
-  return useContract("LUX");
-}
+// export function useLuxContract(): Contract | null {
+//   return useContract("LUX");
+// }
 export function useTeleportContract(): (chain) => Contract | null {
   const { account, library } = useActiveWeb3React()
   const dispatch = useDispatch()
