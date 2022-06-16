@@ -53,13 +53,21 @@ function ColorlibStepIcon(props: StepIconProps & { steps: any }) {
     (acc, _, i) => ({
       ...acc,
       [i + 1]: (
-        <Image
-          src={`${_.logo}`}
-          alt=""
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
+        <>
+          {active && (
+            <span
+              style={{ height: 30, width: 30 }}
+              className="absolute inline-flex rounded-full opacity-75 animate-ping bg-sky-400"
+            ></span>
+          )}
+          <Image
+            src={`${_.logo}`}
+            alt=""
+            width={40}
+            height={40}
+            className="rounded-full "
+          />
+        </>
       ),
     }),
     {}
@@ -82,13 +90,19 @@ interface Step {
   sublabel?: string;
 }
 
-export default function CustomizedSteppers({ steps }: { steps: Step[] }) {
+export default function CustomizedSteppers({
+  steps,
+  activeStep,
+}: {
+  steps: Step[];
+  activeStep: number;
+}) {
   return (
     <div style={{ width: "100%", marginBottom: 24, marginTop: 50 }}>
       <Stack sx={{ width: "100%" }} spacing={4}>
         <Stepper
           alternativeLabel
-          activeStep={steps.length - 1}
+          activeStep={activeStep}
           connector={<ColorlibConnector />}
         >
           {steps.map((label) => (
@@ -98,11 +112,13 @@ export default function CustomizedSteppers({ steps }: { steps: Step[] }) {
                   ColorlibStepIcon({ ...e, steps: steps })
                 }
               >
-                <p className="text-white font-semibold text-base">
+                <p className="text-base font-semibold text-white">
                   {label.label}
                 </p>
                 {label.sublabel && (
-                  <p className="opacity-50 text-xs text-white">Private Routing</p>
+                  <p className="text-xs text-white opacity-50">
+                    Private Routing
+                  </p>
                 )}
               </StepLabel>
             </Step>

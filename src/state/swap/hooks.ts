@@ -466,6 +466,7 @@ export const useAllTokenBalances = () => {
 
   return balances.length > 0 ? balances : [];
 };
+
 export const useToken = (address) => {
   const { tokens } = useAppSelector((state: AppState) => state.swap);
 

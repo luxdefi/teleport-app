@@ -134,20 +134,20 @@ const Swap: React.FC<SwapProps> = ({}) => {
   const handleChange = (value, side?) => {
     const newAmount = { ...currentAmount, [side || currentSelectSide]: value };
 
-    // if (!isCrossChain) {
-    getQuote(newAmount, side);
-    // } else {
-    //   if (side === Field.INPUT) {
-    //     console.log("okurrrrurhuinsjcd");
-    //     newAmount.to = (value - value * 0.001).toString();
-    //   } else {
-    //     console.log("init value", newAmount);
-    //     const newVal = value * 0.001;
-    //     console.log(" value * 0.001 value", value, newVal);
+    if (!isCrossChain) {
+      getQuote(newAmount, side);
+    } else {
+      if (side === Field.INPUT) {
+        console.log("okurrrrurhuinsjcd");
+        newAmount.to = (value - value * 0.001).toString();
+      } else {
+        console.log("init value", newAmount);
+        const newVal = value * 0.001;
+        console.log(" value * 0.001 value", value, newVal);
 
-    //     newAmount.from = (newVal + value).toString();
-    //   }
-    // }
+        newAmount.from = (newVal + value).toString();
+      }
+    }
     if (currentBalances[Field.INPUT] < newAmount.from) {
       dispatch(
         updateError({
@@ -192,6 +192,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
 
   //BRIDGE FUNCTIONS
   async function handleInput() {
+    if (chainId !== activeChains?.from) {
+      await switchChain(activeChains?.from, library, account);
+    }
     setBridgeState({ ...bridgeState, status: "PROCESSING" });
     const teleportContractBurn2 = await setNets();
     const msgSig = await library
@@ -500,11 +503,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 status: "SUCCESS",
                 text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
               });
-              setTimeout(() => {
-                setBridgeState({
-                  status: "SUCCESS",
-                });
-              }, 2000);
               return;
             } else {
               setBridgeState({
@@ -535,11 +533,6 @@ const Swap: React.FC<SwapProps> = ({}) => {
               status: "SUCCESS",
               text: `If the Teleport token hasn't already been added to your wallet yet, use the button below to add it. Make sure to add it to the right MetaMask account.`,
             });
-            setTimeout(() => {
-              setBridgeState({
-                status: "SUCCESS",
-              });
-            }, 2000);
           }
 
           TeleportContractMint.removeAllListeners(["BridgeMinted"]);
@@ -707,28 +700,47 @@ const Swap: React.FC<SwapProps> = ({}) => {
             activeChains.to &&
             activeChains.to !== activeChains.from && (
               <CustomizedSteppers
-                steps={[
-                  {
-                    label: NETWORK_LABEL[Number(activeChains?.from)],
-                    icon: 1,
-                    logo:
-                      NETWORK_ICON[Number(activeChains?.from)] ||
-                      "/icons/livepeer.png",
-                  },
-                  {
-                    label: "Teleport",
-                    sublabel: "Private Routing",
-                    icon: 2,
-                    logo: "/icons/livepeer.png",
-                  },
-                  {
-                    label: NETWORK_LABEL[Number(activeChains?.to)],
-                    icon: 3,
-                    logo:
-                      NETWORK_ICON[Number(activeChains?.to)] ||
-                      "/icons/livepeer.png",
-                  },
-                ]}
+                activeStep={
+                  bridgeState?.status === "MINTED"
+                    ? 1
+                    : bridgeState?.status === "TRANSFERING"
+                    ? 2
+                    : 0
+                }
+                steps={
+                  bridgeState?.status === "SUCCESS"
+                    ? [
+                        {
+                          label: NETWORK_LABEL[Number(activeChains?.to)],
+                          icon: 3,
+                          logo:
+                            NETWORK_ICON[Number(activeChains?.to)] ||
+                            "/icons/livepeer.png",
+                        },
+                      ]
+                    : [
+                        {
+                          label: NETWORK_LABEL[Number(activeChains?.from)],
+                          icon: 1,
+                          logo:
+                            NETWORK_ICON[Number(activeChains?.from)] ||
+                            "/icons/livepeer.png",
+                        },
+                        {
+                          label: "Teleport",
+                          sublabel: "Private Routing",
+                          icon: 2,
+                          logo: "/icons/livepeer.png",
+                        },
+                        {
+                          label: NETWORK_LABEL[Number(activeChains?.to)],
+                          icon: 3,
+                          logo:
+                            NETWORK_ICON[Number(activeChains?.to)] ||
+                            "/icons/livepeer.png",
+                        },
+                      ]
+                }
               />
             )}
           {currentTrade.from &&
@@ -762,7 +774,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   Destination Address
                 </p>
               </div>
-            )}{" "}
+            )}
+
             {!account ? (
               <div
                 className="w-full px-6 py-4 text-base text-center text-white border rounded-full shadow-sm cursor-pointer focus:ring-2 focus:ring-offset-2 bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
@@ -770,13 +783,9 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 Connect Wallet
               </div>
-            ) : !evmToAddress || !isAddress(evmToAddress) ? (
-              <div>
-                <p>Add a valid EVM Address</p>
-              </div>
             ) : (
               <button
-                className="w-full h-10 text-base text-center text-white border rounded-full shadow-sm focus:ring- focus:ring-offset- bg-primary-300 border-dark-800 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
+                className="w-full h-10 text-base text-center text-white rounded-full shadow-sm bg-primary-300 disabled:bg-opacity-80 disabled:cursor-not-allowed focus:outline-none"
                 onClick={async () => {
                   if (
                     bridgeState?.status === "MINTED" ||
@@ -785,9 +794,15 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   ) {
                     completeTransaction();
                     console.log("activechainssss", activeChains);
-                  } else if (chainId !== Number(activeChains?.from)) {
-                    switchChain(activeChains?.from, library, account);
-                  } else handleInput();
+                  } else if (bridgeState?.status === "SUCCESS") {
+                    setBridgeState({ status: "IDLE" });
+                  } else {
+                    if (!evmToAddress || !isAddress(evmToAddress)) {
+                      alert("Update EVM address");
+                      return;
+                    }
+                    handleInput();
+                  }
                 }}
                 id="swap-button"
                 // disabled={
@@ -804,25 +819,24 @@ const Swap: React.FC<SwapProps> = ({}) => {
               >
                 {bridgeState?.status === "PROCESSING" ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
-                ) : bridgeState?.status === "MINTED" ||
-                  bridgeState?.status === "BURNED" ? (
+                ) : bridgeState?.status === "BURNED" ? (
+                  "Minting"
+                ) : bridgeState?.status === "MINTED" ? (
                   <div className="flex h-full">
-                    <div
-                      onClick={() => setBridgeState({ status: "IDLE" })}
-                      className="flex items-center justify-center w-1/3 h-full rounded-l-full bg-red"
-                    >
-                      <RedoRounded />
-                    </div>
                     <div className="flex items-center justify-center w-2/3 ">
                       Continue
+                    </div>
+                    <div
+                      onClick={() => setBridgeState({ status: "IDLE" })}
+                      className="flex items-center justify-center w-1/3 h-full rounded-l-full bg-primary "
+                    >
+                      <RedoRounded />
                     </div>
                   </div>
                 ) : bridgeState?.status === "TRANSFERING" ? (
                   "Transfering"
-                ) : chainId !== activeChains?.from ? (
-                  `switch to ${
-                    NETWORK_LABEL[Number(activeChains?.from) || 1]
-                  } network`
+                ) : bridgeState?.status === "SUCCESS" ? (
+                  "Restart"
                 ) : (
                   "Bridge"
                 )}
