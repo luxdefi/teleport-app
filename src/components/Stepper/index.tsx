@@ -28,7 +28,7 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 1,
-    border: 0,
+    border: "1px dashed #323546",
     borderRadius: 1,
   },
 }));

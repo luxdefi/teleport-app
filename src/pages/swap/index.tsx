@@ -703,7 +703,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
                 activeStep={
                   bridgeState?.status === "MINTED"
                     ? 1
-                    : bridgeState?.status === "TRANSFERING"
+                    : bridgeState?.status === "TRANSFERING" ||
+                      bridgeState?.status === "SUCCESS"
                     ? 2
                     : 0
                 }
