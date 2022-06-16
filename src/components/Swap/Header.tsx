@@ -6,9 +6,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useGasPrice } from "state/network/hooks";
-import { AppState } from "state/store";
+
 import { useFetchUserBalances } from "state/swap/hooks";
 import { Token } from "state/types";
 
@@ -43,10 +41,6 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({
   fromChain,
   toChain,
 }) => {
-  const gasPrice = useGasPrice();
-  const luxBalance = useSelector<AppState, AppState["lux"]["luxBalance"]>(
-    (state) => state.lux.luxBalance
-  );
   const fetchUserBalances = useFetchUserBalances();
 
   const [isSlipToleranceModal, setIsSlipToleranceModal] =
