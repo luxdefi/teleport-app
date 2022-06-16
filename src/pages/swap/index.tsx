@@ -194,6 +194,7 @@ const Swap: React.FC<SwapProps> = ({}) => {
   async function handleInput() {
     if (chainId !== activeChains?.from) {
       await switchChain(activeChains?.from, library, account);
+      return;
     }
     setBridgeState({ ...bridgeState, status: "PROCESSING" });
     const teleportContractBurn2 = await setNets();
@@ -219,24 +220,25 @@ const Swap: React.FC<SwapProps> = ({}) => {
       let cnt = 0;
 
       // Listen for burning completion
-      teleportContractBurn2.once("BridgeBurned", async (caller, amount) => {
-        console.log("Recipient:", caller);
+      //CANT BE TRUSTED
+      // teleportContractBurn2.once("BridgeBurned", async (caller, amount) => {
+      //   console.log("Recipient:", caller);
 
-        console.log("Amount:", amount.toString());
+      //   console.log("Amount:", amount.toString());
 
-        if (cnt == 0) {
-          setBridgeState({ ...bridgeState, status: "BURNED" });
-          handleMint(
-            amount,
-            cnt,
-            activeChains?.from,
-            activeChains?.to,
-            tx,
-            msgSig
-          );
-          cnt++;
-        }
-      });
+      //   if (cnt == 0) {
+      //     setBridgeState({ ...bridgeState, status: "BURNED" });
+      //     handleMint(
+      //       amount,
+      //       cnt,
+      //       activeChains?.from,
+      //       activeChains?.to,
+      //       tx,
+      //       msgSig
+      //     );
+      //     cnt++;
+      //   }
+      // });
 
       const receipt = await tx.wait();
       console.log("Receipt:", receipt, receipt.status === 1);
@@ -791,7 +793,8 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   if (
                     bridgeState?.status === "MINTED" ||
                     bridgeState?.status === "TRANSFERING" ||
-                    bridgeState?.status === "BURNED"
+                    bridgeState?.status === "BURNED" ||
+                    bridgeState?.status === "FAILED" //Take this out
                   ) {
                     completeTransaction();
                     console.log("activechainssss", activeChains);
@@ -806,17 +809,12 @@ const Swap: React.FC<SwapProps> = ({}) => {
                   }
                 }}
                 id="swap-button"
-                // disabled={
-                //   (chainId === Number(query?.fromChain ?? 1) &&
-                //     ((query?.fromChain ?? 1) === (query?.toChain ?? 1) &&
-                //     query?.to &&
-                //     query?.from &&
-                //     query?.to === query?.from
-                //       ? true
-                //       : false)) ||
-                //   error ||
-                //   ![ChainId.MAINNET, ChainId.RINKEBY].includes(chainId)
-                // }
+                disabled={
+                  !currentAmount[Field.INPUT] ||
+                  !currentAmount[Field.OUTPUT] ||
+                  bridgeState?.status === "TRANSFERING" ||
+                  bridgeState?.status === "PROCESSING"
+                }
               >
                 {bridgeState?.status === "PROCESSING" ? (
                   <i className="text-white fas fa-circle-notch animate-spin" />
