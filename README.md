@@ -1,4 +1,4 @@
-# bridge-react
+# BRIDGE
 
 Lux Bridge React UI.
 
