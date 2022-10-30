@@ -1,13 +1,13 @@
-# BRIDGE
+# bridge-react
 
-Lux Bridge react UI.
+Lux Bridge React UI.
 
 ### Quick Install
 
 Clone the project.
 
 ```
-git clone https://github.com/luxdefi/BRIDGE
+git clone https://github.com/luxdefi/bridge-react
 ```
 
 Install dependencies and build.
