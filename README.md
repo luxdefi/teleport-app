@@ -1,13 +1,13 @@
-# BRIDGE
+# Lux Teleport App
 
-Lux Bridge React UI.
+Lux Teleport React UI.
 
 ### Quick Install
 
 Clone the project.
 
 ```
-git clone https://github.com/luxdefi/bridge-react
+git clone https://github.com/luxdefi/teleport-app
 ```
 
 Install dependencies and build.
